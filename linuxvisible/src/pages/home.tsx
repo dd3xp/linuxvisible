@@ -1,5 +1,4 @@
-import '../styles/Home_Static.css';
-import '../styles/Home_Dynamic.css';
+import '../styles/Home.css';
 import '../styles/globle.css'
 
 export default function Home() {

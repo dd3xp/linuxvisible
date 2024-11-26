@@ -1,8 +1,0 @@
-.level-1-container-title, 
-.level-2-container-title, 
-.level-3-container-title,
-.kernel-container-title {
-    display: block; /* 让标题作为块级元素独占一行 */
-    width: 100%; /* 占据父容器的全部宽度 */
-    margin-left: 10px;
-}

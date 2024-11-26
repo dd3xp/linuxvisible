@@ -1,37 +1,47 @@
+.level-1-container-title, 
+.level-2-container-title, 
+.level-3-container-title, 
+.kernel-container-title {
+    display: block; /* 让标题作为块级元素独占一行 */
+    width: 100%; /* 占据父容器的全部宽度 */
+    margin-left: 10px;
+    border: 0px solid #000000;
+}
+
 .level-1-container{
-    display: flex;
-    flex-wrap: wrap;
     width:1500px;
     height: 650px;
+    display: inline-block;
+    flex-wrap: wrap;
     border: 1px solid #000000;
 }
 
 .level-2-container{
-    display: flex;
-    flex-wrap: wrap;
     width:750px;
     height: 500px;
     margin-left:10px;
     margin-bottom: 10px;
+    display: inline-block;
+    flex-wrap: wrap;
     border: 1px solid #000000;
 }
 
 .level-3-container{
-    display: flex;
-    flex-wrap: wrap;
     width:500px;
     height: 300px;
     margin-left:10px;
     margin-bottom: 10px;
+    display: inline-block;
+    flex-wrap: wrap;
     border: 1px solid #000000;
 }
 
 .kernel-container{
-    display: flex;
-    flex-wrap: wrap;
     width:100px;
     height: 100px;
     margin-left:10px;
     margin-bottom: 10px;
+    display: inline-block;
+    flex-wrap: wrap;
     border: 1px solid #000000;
 }
