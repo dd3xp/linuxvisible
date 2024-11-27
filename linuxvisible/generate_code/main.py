@@ -25,7 +25,7 @@ if __name__ == "__main__":
     Level1Container(100, 100, 10, 10, 200, 200, "lizhixu4")
     Level1Container(100, 100, 10, 10, 200, 200, "lizhixu5")
     
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin1", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 300, 300, "kanhaibin1", "lizhixu1")
     Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin2", "lizhixu1")
     Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin3", "lizhixu1")
     Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin4", "lizhixu1")
@@ -36,6 +36,10 @@ if __name__ == "__main__":
     Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin9", "lizhixu1")
     Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin10", "lizhixu1")
     Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin11", "lizhixu1")
+
+    Level3Container(100, 100, 10, 10, 50, 50, "wzh3", "kanhaibin1")
+    Level3Container(100, 100, 10, 10, 50, 50, "wzh2", "kanhaibin1")
+    Level3Container(100, 100, 10, 10, 50, 50, "wzh1", "kanhaibin1")
 
     # 生成tsx文件尾部分
     with open(tsx_path, "a") as file:
