@@ -7,6 +7,10 @@ export default function Home() {
        <div className="lizhixu1">
            <h2 className="lizhixu1-visible">lizhixu1</h2>
            {/*The code to declare the subcontainer of lizhixu1 will generate right here*/}
+           <div className="kanhaibin1">
+               <h3 className="kanhaibin1-visible">kanhaibin1</h3>
+               {/*The code to declare the subcontainer of kanhaibin1 will generate right here*/}
+           </div>
        </div>
        <div className="lizhixu2">
            <h2 className="lizhixu2-visible">lizhixu2</h2>

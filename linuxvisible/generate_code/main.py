@@ -17,11 +17,25 @@ if __name__ == "__main__":
         file.write("export default function Home() {\n")
         file.write("    return (\n      <>\n")
 
-    Level1Container(100, 100, 10, 10, 200, 200, "lizhixu1")
+    # 一级容器部分
+    # def Level1Container(width, height, top, left, maxwidth, maxheight, title):
+    Level1Container(100, 100, 10, 10, 500, 500, "lizhixu1")
     Level1Container(100, 100, 10, 10, 200, 200, "lizhixu2")
     Level1Container(100, 100, 10, 10, 200, 200, "lizhixu3")
     Level1Container(100, 100, 10, 10, 200, 200, "lizhixu4")
     Level1Container(100, 100, 10, 10, 200, 200, "lizhixu5")
+    
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin1", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin2", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin3", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin4", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin5", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin6", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin7", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin8", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin9", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin10", "lizhixu1")
+    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin11", "lizhixu1")
 
     # 生成tsx文件尾部分
     with open(tsx_path, "a") as file:
