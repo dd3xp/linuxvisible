@@ -10,7 +10,7 @@ def Level1Container(width, height, top, left, maxwidth, maxheight, title):
     titleWithHyphen = title.replace(" ", "-")
     visibleTitle = titleWithHyphen + "-visible"
 
-    with open(css_path, "a") as file:
+    with open(css_path, "a", encoding="utf-8") as file:
         # css文件参数部分
         file.write(f".{titleWithHyphen}")
         file.write("{\n")
@@ -29,7 +29,7 @@ def Level1Container(width, height, top, left, maxwidth, maxheight, title):
         file.write("    border: 1px solid #000000;\n")
         file.write("}\n")
 
-    with open(tsx_path, "a") as file:
+    with open(tsx_path, "a", encoding="utf-8") as file:
         # tsx文件参数部分
         file.write(f"       <div className=\"{titleWithHyphen}\">\n")
         file.write(f"           <h2 className=\"{visibleTitle}\">{title}</h2>\n")
@@ -49,7 +49,7 @@ def Level2Container(width, height, top, left, maxwidth, maxheight, title, belong
     titleWithHyphen = title.replace(" ", "-")
     visibleTitle = titleWithHyphen + "-visible"
 
-    with open(css_path, "a") as file:
+    with open(css_path, "a", encoding="utf-8") as file:
         # css文件参数部分
         file.write(f".{titleWithHyphen}")
         file.write("{\n")
@@ -71,7 +71,7 @@ def Level2Container(width, height, top, left, maxwidth, maxheight, title, belong
     # 定位容器摆放位置
     target_line = f"{{/*The code to declare the subcontainer of {belongTo} will generate right here*/}}"
 
-    with open(tsx_path, "r+") as file:
+    with open(tsx_path, "r+", encoding="utf-8") as file:
         # 找到插入组件的位置
         lines = file.readlines()
         file.seek(0)
@@ -95,7 +95,7 @@ def Level3Container(width, height, top, left, maxwidth, maxheight, title, belong
     titleWithHyphen = title.replace(" ", "-")
     visibleTitle = titleWithHyphen + "-visible"
 
-    with open(css_path, "a") as file:
+    with open(css_path, "a", encoding="utf-8") as file:
         # css文件参数部分
         file.write(f".{titleWithHyphen}")
         file.write("{\n")
@@ -117,7 +117,7 @@ def Level3Container(width, height, top, left, maxwidth, maxheight, title, belong
     # 定位容器摆放位置
     target_line = f"{{/*The code to declare the subcontainer of {belongTo} will generate right here*/}}"
 
-    with open(tsx_path, "r+") as file:
+    with open(tsx_path, "r+", encoding="utf-8") as file:
         # 找到插入组件的位置
         lines = file.readlines()
         file.seek(0)

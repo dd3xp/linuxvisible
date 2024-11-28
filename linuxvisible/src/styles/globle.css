@@ -3,6 +3,10 @@ h2{
 }
 h3{
     margin-left: 10px;
-    margin-right: 10px;
-    width: 100%;
+}
+
+.screen{
+    display: flex; /* 使用 flex 布局 */
+    flex-wrap: wrap; /* 如果需要，允许换行 */
+    align-items: center; /* 垂直居中对齐 */
 }

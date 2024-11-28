@@ -3,7 +3,10 @@ import '../styles/globle.css';
 
 export default function Home() {
     return (
-      <>
+      <div className="screen">
+       <div className="design1">
+           <h2 className="design1_title">设计底图</h2>
+       </div>
        <div className="lizhixu1">
            <h2 className="lizhixu1-visible">lizhixu1</h2>
            {/*The code to declare the subcontainer of lizhixu1 will generate right here*/}
@@ -80,6 +83,6 @@ export default function Home() {
            <h2 className="lizhixu5-visible">lizhixu5</h2>
            {/*The code to declare the subcontainer of lizhixu5 will generate right here*/}
        </div>
-      </>
+      </div>
    )
 }
