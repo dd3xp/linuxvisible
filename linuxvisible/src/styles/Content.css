@@ -1,13 +1,238 @@
-.design1 {
+.Linux{
+   min-width: 1050px;
+   min-height: 600px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 1050px;
+   max-height: 600px;
+    width: auto;
+    height: auto;
     display: flex;
-    justify-content: flex-start; /* 使内容靠左 */
-    align-items: center; /* 垂直居中 */
-    height: 100vh; /* 设置容器高度为视口高度 */
-    padding-left: 20px; /* 给容器添加左侧内边距，使文字更靠近左侧 */
+    flex-wrap: wrap;
+    font-size: 0;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px solid #000000;
 }
-
-.design1_title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
+.arch{
+   min-width: 300px;
+   min-height: 300px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 300px;
+   max-height: 300px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.net{
+   min-width: 300px;
+   min-height: 300px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 300px;
+   max-height: 300px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.drivers{
+   min-width: 300px;
+   min-height: 175px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 300px;
+   max-height: 175px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.fs{
+   min-width: 400px;
+   min-height: 300px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 400px;
+   max-height: 300px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.Memory-Management{
+   min-width: 300px;
+   min-height: 425px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 300px;
+   max-height: 425px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.kernel{
+   min-width: 300px;
+   min-height: 225px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 300px;
+   max-height: 225px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.ipc{
+   min-width: 75px;
+   min-height: 50px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 75px;
+   max-height: 50px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.sound{
+   min-width: 75px;
+   min-height: 50px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 75px;
+   max-height: 50px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.virt{
+   min-width: 75px;
+   min-height: 50px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 75px;
+   max-height: 50px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.security{
+   min-width: 75px;
+   min-height: 50px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 75px;
+   max-height: 50px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.init{
+   min-width: 75px;
+   min-height: 50px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 75px;
+   max-height: 50px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.crypto{
+   min-width: 75px;
+   min-height: 50px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 75px;
+   max-height: 50px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
+}
+.tool{
+   min-width: 500px;
+   min-height: 50px;
+   margin-top: 10px;
+   margin-left: 10px;
+   max-width: 500px;
+   max-height: 50px;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: initial;
+    align-items: stretch;
+    justify-content: flex-start;
+    align-content: flex-start;
+    border: 1px dashed #000000;
 }

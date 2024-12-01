@@ -1,5 +1,4 @@
 from generate_react_code import *
-from generate_test1 import *
 
 if __name__ == "__main__":
     
@@ -16,34 +15,30 @@ if __name__ == "__main__":
         file.write("import '../styles/Content.css';\n")
         file.write("import '../styles/globle.css';\n\n")
         file.write("const Content:React.FC = () => {\n")
-        file.write("    return(\n")
+        file.write("    return(\n       <>\n")
+
 
     # 一级容器部分
     # def Level1Container(width, height, top, left, maxwidth, maxheight, title):
-    generate_left_container()
+    Level1Container("Linux", 1050, 600)
     
-    '''Level1Container(100, 100, 10, 10, 500, 500, "lizhixu1")
-    Level1Container(100, 100, 10, 10, 200, 200, "lizhixu2")
-    Level1Container(100, 100, 10, 10, 200, 200, "lizhixu3")
-    Level1Container(100, 100, 10, 10, 200, 200, "lizhixu4")
-    Level1Container(100, 100, 10, 10, 200, 200, "lizhixu5")
-    
-    Level2Container(100, 100, 10, 10, 300, 300, "kanhaibin1", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin2", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin3", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin4", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin5", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin6", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin7", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin8", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin9", "lizhixu1")
-    Level2Container(100, 100, 10, 10, 100, 100, "kanhaibin10", "lizhixu1")
-    Level2Container(100, 200, 10, 10, 100, 200, "kanhaibin11", "lizhixu1")
+    # 二级容器部分
+    # def Level2Container(width, height, top, left, maxwidth, maxheight, title, belongTo):
+    Level2Container("arch", "Linux", 300, 300)
+    Level2Container("net", "Linux", 300, 300)
+    Level2Container("drivers", "Linux", 300, 175)
+    Level2Container("fs", "Linux", 400, 300)
+    Level2Container("Memory Management", "Linux", 300, 425)
+    Level2Container("kernel", "Linux", 300, 225)
+    Level2Container("ipc", "Linux", 75, 50)
+    Level2Container("sound", "Linux", 75, 50)
+    Level2Container("virt", "Linux", 75, 50)
+    Level2Container("security", "Linux", 75, 50)
+    Level2Container("init", "Linux", 75, 50)
+    Level2Container("crypto", "Linux", 75, 50)
+    Level2Container("tool", "Linux", 500, 50)
 
-    Level3Container(100, 100, 10, 10, 50, 50, "wzh3", "kanhaibin1")
-    Level3Container(100, 100, 10, 10, 50, 50, "wzh2", "kanhaibin1")
-    Level3Container(100, 100, 10, 10, 50, 50, "wzh1", "kanhaibin1")'''
 
     # 生成tsx文件尾部分
     with open(tsx_path, "a", encoding="utf-8") as file:
-        file.write("    )\n}\nexport default Content;\n")
+        file.write("        </>\n   )\n}\nexport default Content;\n")
