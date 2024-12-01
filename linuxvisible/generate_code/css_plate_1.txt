@@ -1,7 +1,0 @@
-.main_structure {
-    height: 300px;
-    width: 300px;
-    top-margin: 10px;
-    left-margin: 10px;
-    
-}

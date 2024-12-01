@@ -3,8 +3,8 @@ import os
 def Level1Container(width, height, top, left, maxwidth, maxheight, title):
     # 获取当前脚本文件的目录
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    css_path = os.path.join(base_dir, "../src/styles/test.css")
-    tsx_path = os.path.join(base_dir, "../src/pages/test.tsx")
+    css_path = os.path.join(base_dir, "../src/styles/Content.css")
+    tsx_path = os.path.join(base_dir, "../src/pages/content.tsx")
 
     # 处理标题，将标题中的空格变成-（连字符），并增加可视标题变量
     titleWithHyphen = title.replace(" ", "-")
@@ -42,8 +42,8 @@ def Level1Container(width, height, top, left, maxwidth, maxheight, title):
 def Level2Container(width, height, top, left, maxwidth, maxheight, title, belongTo):
     # 获取当前脚本文件的目录
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    css_path = os.path.join(base_dir, "../src/styles/test.css")
-    tsx_path = os.path.join(base_dir, "../src/pages/test.tsx")
+    css_path = os.path.join(base_dir, "../src/styles/content.css")
+    tsx_path = os.path.join(base_dir, "../src/pages/content.tsx")
 
     # 处理标题，将标题中的空格变成-（连字符），并增加可视标题变量
     titleWithHyphen = title.replace(" ", "-")
@@ -89,8 +89,8 @@ def Level2Container(width, height, top, left, maxwidth, maxheight, title, belong
 def Level3Container(width, height, top, left, maxwidth, maxheight, title, belongTo):
     # 获取当前脚本文件的目录
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    css_path = os.path.join(base_dir, "../src/styles/test.css")
-    tsx_path = os.path.join(base_dir, "../src/pages/test.tsx")
+    css_path = os.path.join(base_dir, "../src/styles/content.css")
+    tsx_path = os.path.join(base_dir, "../src/pages/content.tsx")
     # 处理标题，将标题中的空格变成-（连字符），并增加可视标题变量
     titleWithHyphen = title.replace(" ", "-")
     visibleTitle = titleWithHyphen + "-visible"

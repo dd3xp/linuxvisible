@@ -3,8 +3,8 @@ import os
 def generate_left_container():
     # 获取当前脚本文件的目录
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    css_path = os.path.join(base_dir, "../src/styles/test.css")
-    tsx_path = os.path.join(base_dir, "../src/pages/test.tsx")
+    css_path = os.path.join(base_dir, "../src/styles/Content.css")
+    tsx_path = os.path.join(base_dir, "../src/pages/content.tsx")
 
     with open(tsx_path, "a", encoding="utf-8") as file:
         # tsx文件参数部分
