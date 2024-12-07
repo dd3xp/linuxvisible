@@ -17,27 +17,16 @@ if __name__ == "__main__":
         file.write("const Content:React.FC = () => {\n")
         file.write("    return(\n       <>\n")
 
-
-    # 一级容器部分
-    # def Level1Container(width, height, top, left, maxwidth, maxheight, title):
-    Level1Container("Linux", 1050, 600)
-    
-    # 二级容器部分
-    # def Level2Container(width, height, top, left, maxwidth, maxheight, title, belongTo):
-    Level2Container("arch", "Linux", 300, 300)
-    Level2Container("net", "Linux", 300, 300)
-    Level2Container("drivers", "Linux", 300, 175)
-    Level2Container("fs", "Linux", 400, 300)
-    Level2Container("Memory Management", "Linux", 300, 425)
-    Level2Container("kernel", "Linux", 300, 225)
-    Level2Container("ipc", "Linux", 75, 50)
-    Level2Container("sound", "Linux", 75, 50)
-    Level2Container("virt", "Linux", 75, 50)
-    Level2Container("security", "Linux", 75, 50)
-    Level2Container("init", "Linux", 75, 50)
-    Level2Container("crypto", "Linux", 75, 50)
-    Level2Container("tool", "Linux", 500, 50)
-
+    # GenerateKernelContainer(title, level, x1, y1, x2, y2, belong_to = "linux")
+    GenerateKernelContainer("lizhixu", 1, 0, 0, 5, 5)
+    GenerateKernelContainer("kanhaibin", 2, 0, 0, 5, 5, "lizhixu")
+    GenerateKernelContainer("wangzhihui1", 3, 0, 0, 0, 0, "kanhaibin")
+    GenerateKernelContainer("wangzhihui2", 3, 0, 1, 0, 1, "kanhaibin")
+    GenerateKernelContainer("wangzhihui3", 3, 0, 2, 0, 2, "kanhaibin")
+    GenerateKernelContainer("wangzhihui4", 3, 0, 3, 0, 3, "kanhaibin")
+    GenerateKernelContainer("wangzhihui5", 3, 1, 0, 5, 1, "kanhaibin")
+    GenerateKernelContainer("wangzhihui4", 3, 2, 2, 3, 5, "kanhaibin")
+    GenerateKernelContainer("wangzhihui6", 3, 1, 2, 1, 2, "kanhaibin")
 
     # 生成tsx文件尾部分
     with open(tsx_path, "a", encoding="utf-8") as file:

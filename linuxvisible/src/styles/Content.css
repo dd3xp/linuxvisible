@@ -1,238 +1,54 @@
-.Linux{
-   min-width: 1050px;
-   min-height: 600px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 1050px;
-   max-height: 600px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: 0;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px solid #000000;
+.lizhixu{
+   top: 3px;
+   bottom: 353.0px;
+   left: 3px;
+   right: 803.0px;
 }
-.arch{
-   min-width: 300px;
-   min-height: 300px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 300px;
-   max-height: 300px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.kanhaibin{
+   top: 14px;
+   bottom: 356.0px;
+   left: 6px;
+   right: 806.0px;
 }
-.net{
-   min-width: 300px;
-   min-height: 300px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 300px;
-   max-height: 300px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.wangzhihui1{
+   top: 28px;
+   bottom: 612.0px;
+   left: 12px;
+   right: 1062.0px;
 }
-.drivers{
-   min-width: 300px;
-   min-height: 175px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 300px;
-   max-height: 175px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.wangzhihui2{
+   top: 28px;
+   bottom: 612.0px;
+   left: 62px;
+   right: 1012.0px;
 }
-.fs{
-   min-width: 400px;
-   min-height: 300px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 400px;
-   max-height: 300px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.wangzhihui3{
+   top: 28px;
+   bottom: 612.0px;
+   left: 112px;
+   right: 962.0px;
 }
-.Memory-Management{
-   min-width: 300px;
-   min-height: 425px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 300px;
-   max-height: 425px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.wangzhihui4{
+   top: 28px;
+   bottom: 612.0px;
+   left: 162px;
+   right: 912.0px;
 }
-.kernel{
-   min-width: 300px;
-   min-height: 225px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 300px;
-   max-height: 225px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.wangzhihui5{
+   top: 62px;
+   bottom: 362.0px;
+   left: 12px;
+   right: 1012.0px;
 }
-.ipc{
-   min-width: 75px;
-   min-height: 50px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 75px;
-   max-height: 50px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.wangzhihui4{
+   top: 112px;
+   bottom: 462.0px;
+   left: 112px;
+   right: 812.0px;
 }
-.sound{
-   min-width: 75px;
-   min-height: 50px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 75px;
-   max-height: 50px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
-}
-.virt{
-   min-width: 75px;
-   min-height: 50px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 75px;
-   max-height: 50px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
-}
-.security{
-   min-width: 75px;
-   min-height: 50px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 75px;
-   max-height: 50px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
-}
-.init{
-   min-width: 75px;
-   min-height: 50px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 75px;
-   max-height: 50px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
-}
-.crypto{
-   min-width: 75px;
-   min-height: 50px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 75px;
-   max-height: 50px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
-}
-.tool{
-   min-width: 500px;
-   min-height: 50px;
-   margin-top: 10px;
-   margin-left: 10px;
-   max-width: 500px;
-   max-height: 50px;
-    width: auto;
-    height: auto;
-    display: flex;
-    flex-wrap: wrap;
-    font-size: initial;
-    align-items: stretch;
-    justify-content: flex-start;
-    align-content: flex-start;
-    border: 1px dashed #000000;
+.wangzhihui6{
+   top: 62px;
+   bottom: 562.0px;
+   left: 112px;
+   right: 962.0px;
 }
