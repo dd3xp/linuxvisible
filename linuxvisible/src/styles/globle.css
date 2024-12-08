@@ -1,3 +1,5 @@
+@import url("variable.css");
+
 .level-1-container {
     font-size: 10;
     position: absolute;
@@ -18,26 +20,26 @@
 
 .overlay-container {
     position: relative;
-    width: 1100px;
+    width: var(--container_width);
     height: var(--container_height);
-    margin-left: 30px;
+    margin-left: 20px;
 }
 
 .grid {
     position: absolute;  /* 设置为绝对定位 */
-    opacity: 0.1;
+    opacity: 0.5;
     top: 0;
     left: 0;
-    width: 1100px;
+    width: var(--container_width);
     height: var(--container_height);
 }
 
 .linux{
     position: absolute;  /* 设置为绝对定位 */
-    width: 1100px;
+    width: var(--container_width);
     height: var(--container_height);
     margin-left: 20px;
-    border: 3px solid #000000;
+    border: 1px solid #000000;
 }
 
 .screen{

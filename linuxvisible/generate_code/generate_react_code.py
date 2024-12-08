@@ -1,18 +1,20 @@
 import os
 
-kernel_list = {}
-
 # 单元化网格
 linux_size = [1100, 650]
 grid_size = 50
 col_amount = linux_size[0] / grid_size
 row_amount = linux_size[1] / grid_size
+max_level = 3
 
 # 设置边距
-level_1_margin = 3
-level_2_margin = 6
-level_3_margin = 8
-title_size = 8
+level_1_margin = 5
+level_2_margin = 7
+level_3_margin = 9
+title_size = 10
+
+# 组件字典
+kernel_list = {"linux": [0, 0, row_amount - 1, col_amount - 1]}
 
 def GenerateKernelContainer(title, level, x1, y1, x2, y2, belong_to = "linux"):
     # 将坐标信息添加到字典中
@@ -21,7 +23,7 @@ def GenerateKernelContainer(title, level, x1, y1, x2, y2, belong_to = "linux"):
 
     # 处理标题
     title_with_hyphen = title.replace(" ", "-")
-    visible_title = title_with_hyphen + "-visible"
+    parent_with_hyphen = belong_to.replace(" ", "-")
 
     # 算出相对大容器的位置
     margin = MarginDefine(level)
@@ -35,8 +37,8 @@ def GenerateKernelContainer(title, level, x1, y1, x2, y2, belong_to = "linux"):
     # tsx文件
     with open(tsx_path, "a", encoding="utf-8") as file:
     # tsx文件参数部分
-        file.write(f"       <div className=\"{title_with_hyphen} level-{level}-container\">\n")
-        file.write(f"           <div className=\"{visible_title}\">{title}</div>\n")
+        file.write(f"       <div className=\"{title_with_hyphen} level-{level}-container {parent_with_hyphen}-{level}\">\n")
+        file.write(f"           <div className=\"level-{level}-title {parent_with_hyphen}-title\">{title}</div>\n")
         file.write(f"       </div>\n")
 
     # css文件
@@ -55,9 +57,13 @@ def GenerateKernelContainer(title, level, x1, y1, x2, y2, belong_to = "linux"):
 
 # 计算css中的top、bottom、left、right
 def Position(coordinate, margin, belong_to, level):
+    condition_margin = level + 2
+    parents_coordinate = kernel_list.get(belong_to)
+
+    print(f"parents: {parents_coordinate}\ncoordinate: {coordinate}")
+    
     # 设置标题间距
     if belong_to != "linux":
-        parents_coordinate = kernel_list.get(belong_to)
         if coordinate[0] == parents_coordinate[0]:
             top_margin = margin + title_size * (level - 1)
         else:
@@ -66,13 +72,29 @@ def Position(coordinate, margin, belong_to, level):
         top_margin = margin
 
     # top
-    top = coordinate[0] * grid_size + top_margin
+    top = coordinate[0] * grid_size + top_margin - condition_margin
     # bottom
-    bottom = (row_amount - coordinate[2] - 1) * grid_size + margin
+    bottom = (row_amount - coordinate[2] - 1) * grid_size + margin - condition_margin
     # left
-    left = coordinate[1] * grid_size + margin
+    left = coordinate[1] * grid_size + margin - condition_margin
     # right
-    right = (col_amount - coordinate[3] - 1) * grid_size + margin
+    right = (col_amount - coordinate[3] - 1) * grid_size + margin - condition_margin
+
+    # 检查是否靠上边
+    if coordinate[0] == parents_coordinate[0]:
+        top = top + condition_margin
+    
+    # 检查是否靠下边
+    if coordinate[2] == parents_coordinate[2]:
+        bottom = bottom + condition_margin
+    
+    # 检查是否靠左边
+    if coordinate[1] == parents_coordinate[1]:
+        left = left + condition_margin
+        
+    # 检查是否靠右边
+    if coordinate[3] == parents_coordinate[3]:
+        right = right + condition_margin
 
     position = [top, bottom, left, right]
     return position
@@ -88,3 +110,4 @@ def MarginDefine(level):
     else:
         print("Invalid level input!!!")
     return margin
+

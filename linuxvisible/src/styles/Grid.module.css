@@ -1,8 +1,4 @@
-:root {
-  --container_width: 1100px;
-  --container_height: 650px;
-  --grid_size: 50px;
-}
+@import url("variable.css");
 
 .gridContainer {
     width: var(--container_width);
