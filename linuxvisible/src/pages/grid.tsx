@@ -1,5 +1,5 @@
 import styles from '../styles/Grid.module.css';
-import '../styles/globle.css';
+import '../styles/Global.css';
 
 const Grid:React.FC = () => {
 

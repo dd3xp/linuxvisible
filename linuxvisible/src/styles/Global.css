@@ -1,4 +1,4 @@
-@import url("variable.css");
+@import url("Variable.css");
 
 .level-1-container {
     font-size: 10;
@@ -26,7 +26,7 @@
 }
 
 .grid {
-    position: absolute;  /* 设置为绝对定位 */
+    position: absolute;
     opacity: 0.5;
     top: 0;
     left: 0;
@@ -35,7 +35,7 @@
 }
 
 .linux{
-    position: absolute;  /* 设置为绝对定位 */
+    position: absolute;
     width: var(--container_width);
     height: var(--container_height);
     margin-left: 20px;
@@ -48,7 +48,7 @@
     align-items: center; /* 垂直居中对齐 */
 }
 
-.operation {
+.version-operation {
     display: flex;
     justify-content: flex-start; /* 使内容靠左 */
     align-items: center; /* 垂直居中 */
@@ -56,8 +56,14 @@
     padding-left: 20px; /* 给容器添加左侧内边距，使文字更靠近左侧 */
 }
 
-.operation-title {
+.version-operation-title {
     font-size: 24px;
     font-weight: bold;
     color: #333;
+}
+
+/* 高亮的样式 */
+.highlight {
+    background-color: #ff0; /* 设置背景色为黄色 */
+    color: #000; /* 设置文字颜色为黑色 */
 }

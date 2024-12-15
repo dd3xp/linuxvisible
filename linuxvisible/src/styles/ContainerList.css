@@ -1,0 +1,25 @@
+.container-list {
+    width: var(--list_width);
+    height: var(--list_height);
+    margin-left: 50px;
+    border: 1px solid #000000;
+    overflow-y: auto
+}
+.container-list-title {
+    margin:10px;
+}
+.list-button {
+    width: 90%;
+    padding: 10px;
+    margin-left: calc((var(--list_width) - var(--list_width) * 0.9) / 2);
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #ff5555;
+  }
+  

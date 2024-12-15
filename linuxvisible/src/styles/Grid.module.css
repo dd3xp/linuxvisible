@@ -1,4 +1,4 @@
-@import url("variable.css");
+@import url("Variable.css");
 
 .gridContainer {
     width: var(--container_width);
