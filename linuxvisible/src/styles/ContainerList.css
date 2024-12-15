@@ -8,18 +8,14 @@
 .container-list-title {
     margin:10px;
 }
-.list-button {
-    width: 90%;
+.list-item {
+    width: 80%;
     padding: 10px;
-    margin-left: calc((var(--list_width) - var(--list_width) * 0.9) / 2);
+    margin-left: calc((var(--list_width) - var(--list_width) * 0.95) / 2);
+    margin-bottom: 3px;
     border: none;
-    border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: #ff5555;
-  }
-  
+    border: 1px solid #000000;
+}

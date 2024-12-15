@@ -1,323 +1,176 @@
-import { useState } from 'react';
 import '../styles/Kernel.css';
 import '../styles/Global.css';
-import ContainerList from './containerlist';
 
-const Kernel:React.FC = () => {
-
-    const [selected, setSelected] = useState<string | null>(null);
-
-    const handleContainerSelect = (component: string) => {
-        setSelected(component);
-      };
+interface KernelProps {
+    selected: string | null;
+    onContainerSelect: (component: string | null) => void;
+  }
+  
+  const Kernel: React.FC<KernelProps> = ({ selected, onContainerSelect }) => {
+    
+    const handleClick = (containerName: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+        if (selected === containerName) {
+            onContainerSelect(null);
+        } else {
+            onContainerSelect(containerName);
+        }
+        console.log(`${containerName} activated`);
+    };
 
     return(
         <>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test24 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test24 activated");
-            }
-        }}
-        className="test24 level-3-container test3-3 ${selected === test24 ? 'highlight' : ''}"
+        className={`test24 level-3-container test3-3 ${selected === "test24" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test24', e)}
         >
             <div className="level-3-title test3-title">test24</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test23 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test23 activated");
-            }
-        }}
-        className="test23 level-3-container test3-3 ${selected === test23 ? 'highlight' : ''}"
+        className={`test23 level-3-container test3-3 ${selected === "test23" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test23', e)}
         >
             <div className="level-3-title test3-title">test23</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test22 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test22 activated");
-            }
-        }}
-        className="test22 level-3-container test3-3 ${selected === test22 ? 'highlight' : ''}"
+        className={`test22 level-3-container test3-3 ${selected === "test22" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test22', e)}
         >
             <div className="level-3-title test3-title">test22</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test21 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test21 activated");
-            }
-        }}
-        className="test21 level-3-container test3-3 ${selected === test21 ? 'highlight' : ''}"
+        className={`test21 level-3-container test3-3 ${selected === "test21" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test21', e)}
         >
             <div className="level-3-title test3-title">test21</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test20 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test20 activated");
-            }
-        }}
-        className="test20 level-3-container test3-3 ${selected === test20 ? 'highlight' : ''}"
+        className={`test20 level-3-container test3-3 ${selected === "test20" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test20', e)}
         >
             <div className="level-3-title test3-title">test20</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test19 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test19 activated");
-            }
-        }}
-        className="test19 level-3-container test3-3 ${selected === test19 ? 'highlight' : ''}"
+        className={`test19 level-3-container test3-3 ${selected === "test19" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test19', e)}
         >
             <div className="level-3-title test3-title">test19</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test18 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test18 activated");
-            }
-        }}
-        className="test18 level-3-container test3-3 ${selected === test18 ? 'highlight' : ''}"
+        className={`test18 level-3-container test3-3 ${selected === "test18" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test18', e)}
         >
             <div className="level-3-title test3-title">test18</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test17 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test17 activated");
-            }
-        }}
-        className="test17 level-3-container test3-3 ${selected === test17 ? 'highlight' : ''}"
+        className={`test17 level-3-container test3-3 ${selected === "test17" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test17', e)}
         >
             <div className="level-3-title test3-title">test17</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test16 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test16 activated");
-            }
-        }}
-        className="test16 level-3-container test3-3 ${selected === test16 ? 'highlight' : ''}"
+        className={`test16 level-3-container test3-3 ${selected === "test16" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test16', e)}
         >
             <div className="level-3-title test3-title">test16</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test15 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test15 activated");
-            }
-        }}
-        className="test15 level-3-container test3-3 ${selected === test15 ? 'highlight' : ''}"
+        className={`test15 level-3-container test3-3 ${selected === "test15" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test15', e)}
         >
             <div className="level-3-title test3-title">test15</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test14 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test14 activated");
-            }
-        }}
-        className="test14 level-3-container test3-3 ${selected === test14 ? 'highlight' : ''}"
+        className={`test14 level-3-container test3-3 ${selected === "test14" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test14', e)}
         >
             <div className="level-3-title test3-title">test14</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test13 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test13 activated");
-            }
-        }}
-        className="test13 level-3-container test3-3 ${selected === test13 ? 'highlight' : ''}"
+        className={`test13 level-3-container test3-3 ${selected === "test13" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test13', e)}
         >
             <div className="level-3-title test3-title">test13</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test12 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test12 activated");
-            }
-        }}
-        className="test12 level-3-container test3-3 ${selected === test12 ? 'highlight' : ''}"
+        className={`test12 level-3-container test3-3 ${selected === "test12" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test12', e)}
         >
             <div className="level-3-title test3-title">test12</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test11 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test11 activated");
-            }
-        }}
-        className="test11 level-3-container test3-3 ${selected === test11 ? 'highlight' : ''}"
+        className={`test11 level-3-container test3-3 ${selected === "test11" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test11', e)}
         >
             <div className="level-3-title test3-title">test11</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test10 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test10 activated");
-            }
-        }}
-        className="test10 level-3-container test3-3 ${selected === test10 ? 'highlight' : ''}"
+        className={`test10 level-3-container test3-3 ${selected === "test10" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test10', e)}
         >
             <div className="level-3-title test3-title">test10</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test9 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test9 activated");
-            }
-        }}
-        className="test9 level-3-container test3-3 ${selected === test9 ? 'highlight' : ''}"
+        className={`test9 level-3-container test3-3 ${selected === "test9" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test9', e)}
         >
             <div className="level-3-title test3-title">test9</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test8 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test8 activated");
-            }
-        }}
-        className="test8 level-3-container test3-3 ${selected === test8 ? 'highlight' : ''}"
+        className={`test8 level-3-container test3-3 ${selected === "test8" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test8', e)}
         >
             <div className="level-3-title test3-title">test8</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test7 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test7 activated");
-            }
-        }}
-        className="test7 level-3-container test3-3 ${selected === test7 ? 'highlight' : ''}"
+        className={`test7 level-3-container test3-3 ${selected === "test7" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test7', e)}
         >
             <div className="level-3-title test3-title">test7</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test6 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test6 activated");
-            }
-        }}
-        className="test6 level-3-container test3-3 ${selected === test6 ? 'highlight' : ''}"
+        className={`test6 level-3-container test3-3 ${selected === "test6" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test6', e)}
         >
             <div className="level-3-title test3-title">test6</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test5 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test5 activated");
-            }
-        }}
-        className="test5 level-3-container test3-3 ${selected === test5 ? 'highlight' : ''}"
+        className={`test5 level-3-container test3-3 ${selected === "test5" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test5', e)}
         >
             <div className="level-3-title test3-title">test5</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test4 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test4 activated");
-            }
-        }}
-        className="test4 level-3-container test3-3 ${selected === test4 ? 'highlight' : ''}"
+        className={`test4 level-3-container test3-3 ${selected === "test4" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test4', e)}
         >
             <div className="level-3-title test3-title">test4</div>
         </div>
 
         <div
-        role="button"
-        tabIndex={0}
-        onClick={() => console.log("test2 clicked")}
-        onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                console.log("test2 activated");
-            }
-        }}
-        className="test2 level-3-container test-3 ${selected === test2 ? 'highlight' : ''}"
+        className={`test2 level-3-container test-3 ${selected === "test2" ? 'selected' : ''}`}
+        onClick={(e) => handleClick('test2', e)}
         >
             <div className="level-3-title test-title">test2</div>
         </div>

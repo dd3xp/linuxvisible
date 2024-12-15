@@ -83,15 +83,8 @@ def GenerateTSXCode(title, level, belong_to):
         </div>'''
     kernel_tsx = f'''
         <div
-        role=\"button\"
-        tabIndex={{0}}
-        onClick={{() => console.log(\"{title} clicked\")}}
-        onKeyDown={{(e) => {{
-            if (e.key === \"Enter\" || e.key === \" \") {{
-                console.log(\"{title} activated\");
-            }}
-        }}}}
-        className=\"{title_with_hyphen} level-{level}-container {parent_with_hyphen}-{level} ${{selected === {title_with_hyphen} ? 'highlight' : ''}}\"
+        className={{`{title_with_hyphen} level-{level}-container {parent_with_hyphen}-{level} ${{selected === \"{title_with_hyphen}\" ? 'selected' : ''}}`}}
+        onClick={{(e) => handleClick('{title_with_hyphen}', e)}}
         >
             <div className=\"level-{level}-title {parent_with_hyphen}-title\">{title}</div>
         </div>'''
@@ -140,7 +133,7 @@ right: {position[3]}px;
 
 # 计算css中的top、bottom、left、right
 def Position(coordinate, margin, belong_to, level):
-    condition_margin = level + 2
+    condition_margin = level + 3
     parents_coordinate = kernel_list.get(belong_to)
 
     print(f"parents: {parents_coordinate}\ncoordinate: {coordinate}")

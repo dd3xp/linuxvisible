@@ -4,18 +4,23 @@
     font-size: 10;
     position: absolute;
     border: 1px solid #000000;
+    z-index: 9997
 }
 
 .level-2-container {
     font-size: 10;
     position: absolute;
     border: 1px solid #000000;
+    z-index: 9998
 }
 
 .level-3-container {
+    background-color: rgba(255, 255, 255, 0);
+    cursor: pointer;
     font-size: 10;
     position: absolute;
     border: 1px solid #000000;
+    z-index: 9999
 }
 
 .overlay-container {
@@ -27,7 +32,7 @@
 
 .grid {
     position: absolute;
-    opacity: 0.5;
+    opacity: var(--grid_opacity);
     top: 0;
     left: 0;
     width: var(--container_width);
@@ -62,8 +67,7 @@
     color: #333;
 }
 
-/* 高亮的样式 */
-.highlight {
-    background-color: #ff0; /* 设置背景色为黄色 */
-    color: #000; /* 设置文字颜色为黑色 */
+.selected {
+    background-color: #007bff;
+    color: white;
 }

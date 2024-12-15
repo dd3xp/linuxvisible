@@ -6,10 +6,11 @@ interface Container {
 }
 
 interface ContainerListProps {
+  selected: string | null;
   onContainerSelect: (component: string) => void;
 }
 
-const ContainerList: React.FC = () => {
+const ContainerList: React.FC<ContainerListProps> = ({ selected, onContainerSelect }) => {
   const [containers, setContainers] = useState<string[]>([]);
 
   useEffect(() => {
@@ -26,18 +27,24 @@ const ContainerList: React.FC = () => {
       });
   }, []);
 
+  const handleClick = (component: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    console.log(`Container clicked: ${component}`);
+    onContainerSelect(component);
+  };
+
   return (
     <div className="container-list">
       <div className="container-list-title">特性列表</div>
       <div>
         {containers.map((item, index) => (
-          <button
-            className="list-button"
+          <div
             key={index}
-            onClick={() => console.log(`Button clicked: ${item}`)}
+            className={`list-item ${selected === item ? 'selected' : ''}`}
+            onClick={(e) => handleClick(item, e)}
           >
             {item}
-          </button>
+          </div>
         ))}
       </div>
     </div>
