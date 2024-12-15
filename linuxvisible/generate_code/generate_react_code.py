@@ -9,8 +9,8 @@ max_level = 3
 
 # 设置边距
 level_1_margin = 5
-level_2_margin = 7
-level_3_margin = 9
+level_2_margin = 7.25
+level_3_margin = 9.5
 title_size = 10
 
 # 组件字典
@@ -21,28 +21,49 @@ def GenerateKernelContainer(title, level, x1, y1, x2, y2, belong_to = "linux"):
     coordinate = [x1, y1, x2, y2]
     kernel_list[title] = coordinate
 
-    # 处理标题
-    title_with_hyphen = title.replace(" ", "-")
-    parent_with_hyphen = belong_to.replace(" ", "-")
-
     # 算出相对大容器的位置
     margin = MarginDefine(level)
     position = Position(coordinate, margin, belong_to, level)
 
+    # 生成两个所需的文件
+    GenerateTSXCode(title, level, belong_to)
+    GenerateCSSCode(title, position)
+
+    print(kernel_list)
+    return
+
+def LocateFiles(type):
+    # 确定文件位置
     # 获取当前脚本文件的目录
     base_dir = os.path.dirname(os.path.abspath(__file__))
     css_path = os.path.join(base_dir, "../src/styles/Content.css")
     tsx_path = os.path.join(base_dir, "../src/pages/content.tsx")
 
+    if type == "css":
+        return css_path
+    elif type == "tsx":
+        return tsx_path
+
+def GenerateTSXCode(title, level, belong_to):
+    # 处理标题
+    title_with_hyphen = title.replace(" ", "-")
+    parent_with_hyphen = belong_to.replace(" ", "-")
+
     # tsx文件
-    with open(tsx_path, "a", encoding="utf-8") as file:
+    with open(LocateFiles("tsx"), "a", encoding="utf-8") as file:
     # tsx文件参数部分
         file.write(f"       <div className=\"{title_with_hyphen} level-{level}-container {parent_with_hyphen}-{level}\">\n")
         file.write(f"           <div className=\"level-{level}-title {parent_with_hyphen}-title\">{title}</div>\n")
         file.write(f"       </div>\n")
 
+    return
+
+def GenerateCSSCode(title, position):
+    # 处理标题
+    title_with_hyphen = title.replace(" ", "-")
+
     # css文件
-    with open(css_path, "a", encoding="utf-8") as file:
+    with open(LocateFiles("css"), "a", encoding="utf-8") as file:
         # css文件参数部分
         file.write(f".{title_with_hyphen}")
         file.write("{\n")
@@ -51,8 +72,7 @@ def GenerateKernelContainer(title, level, x1, y1, x2, y2, belong_to = "linux"):
         file.write(f"   left: {position[2]}px;\n")
         file.write(f"   right: {position[3]}px;\n")
         file.write("}\n")
-
-    print(kernel_list)
+    
     return
 
 # 计算css中的top、bottom、left、right
