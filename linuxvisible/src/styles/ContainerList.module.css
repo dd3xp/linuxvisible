@@ -1,0 +1,115 @@
+.sideCollapse {
+    width: var(--list_width);
+    margin-left: 30px;
+    background-color: #ffffff;
+}
+
+.versionItem {
+    margin: 5px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.containerList {
+    min-height: 100px;
+    max-height: var(--list_height);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.listItem {
+    width: 80%;
+    position: relative;
+    padding: 10px;
+    margin-bottom: 3px;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* 添加贡献部分的样式 */
+.contributionSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 垂直居中对齐 */
+    width: 100%; /* 占据全宽，方便自适应 */
+    margin-top: 20px;
+}
+
+.contributionItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.contributionCircle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #ffffff; /* 默认白色 */
+    border: 1px solid #000000; /* 默认黑色边框 */
+    margin-right: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.contributionCircleActive {
+    background-color: #000000; /* 激活时黑色 */
+    border-color: #000000;
+}
+.contributionCircle:hover {
+    background-color: #f0f0f0; /* 悬停时浅灰色 */
+    border-color: #333333; /* 悬停时边框变深 */
+}
+
+.contributionLabel {
+    margin-right: 10px;
+}
+
+.contributionIcon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer; /* 鼠标悬停时显示点击手形 */
+}
+
+/* 模态框标题 */
+.modalTitle {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0; /* 去除标题下的间距 */
+    padding-right: 30px; /* 为叉键留空间 */
+}
+
+/* 表格样式 */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    table-layout: fixed; /* 防止表格大小随内容变化 */
+}
+
+/* 表格每一列固定宽度 */
+.table th, .table td {
+    border: 1px solid black; /* 黑色边框 */
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+    white-space: nowrap; /* 防止文字换行 */
+    overflow: hidden; /* 隐藏溢出的文字 */
+    text-overflow: ellipsis; /* 超出部分显示省略号 */
+}
+
+/* 表头背景色 */
+.table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+/* 给加粗行添加边框 */
+.boldRow > td {
+    border-top: 2px solid black !important;
+}

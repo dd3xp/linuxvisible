@@ -1,26 +1,38 @@
-@import url("Variable.css");
+:root {
+    --container_width: 1400px;
+    --container_height: 750px;
+    --grid_size: 50px;
+    --grid_opacity:0.5;
+    --list_width: 200px;
+    --list_height:450px;
+  }
 
 .level-1-container {
     font-size: 10;
     position: absolute;
     border: 1px solid #000000;
-    z-index: 9997
+    z-index: 999
 }
 
 .level-2-container {
     font-size: 10;
     position: absolute;
     border: 1px solid #000000;
-    z-index: 9998
+    z-index: 998
 }
 
 .level-3-container {
-    background-color: rgba(255, 255, 255, 0);
+    background-color: #cce4b4;
     cursor: pointer;
     font-size: 10;
     position: absolute;
-    border: 1px solid #000000;
-    z-index: 9999
+    border: none;
+    z-index: 999;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .overlay-container {
@@ -44,13 +56,13 @@
     width: var(--container_width);
     height: var(--container_height);
     margin-left: 20px;
-    border: 1px solid #000000;
+    border: 1px solid lightgray;
 }
 
 .screen{
     display: flex; /* 使用 flex 布局 */
     flex-wrap: wrap; /* 如果需要，允许换行 */
-    align-items: center; /* 垂直居中对齐 */
+    align-items:flex-start; /* 垂直居中对齐 */
 }
 
 .version-operation {
@@ -67,7 +79,46 @@
     color: #333;
 }
 
+.feature-selected {
+    background-color: #e4f4fc;
+    color: #007bff;
+}
+
 .selected {
-    background-color: #007bff;
+    background-color: #007bff !important;
     color: white;
+}
+
+#context-menu {
+    display: none;
+    position: absolute;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: white;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+}
+
+.modal-open #context-menu {
+    display: none; /* 当模态框打开时隐藏右键菜单 */
+}
+
+#context-menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+#context-menu ul li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+#context-menu ul li:hover {
+    background-color: #f0f0f0;
+}
+
+.company-logo {
+    border-radius: 5px; /* 圆角效果 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    object-fit: cover; /* 确保图片比例一致 */
 }

@@ -1,11 +1,12 @@
 import styles from '../styles/Grid.module.css';
-import '../styles/Global.css';
+// import '../styles/Global.css';
+import { gridSize, linuxSize } from './utils/calculateContainerPos';
 
 const Grid:React.FC = () => {
 
-    const WIDTH = 1100;
-    const HEIGHT = 650;
-    const GRID = 50;
+    const WIDTH = linuxSize[0];
+    const HEIGHT = linuxSize[1];
+    const GRID = gridSize;
     
     const COLS = WIDTH / GRID;
     const ROWS = HEIGHT / GRID;
@@ -17,6 +18,7 @@ const Grid:React.FC = () => {
           <div key={i} className={styles.gridRow}>
             {row.map((_, j) => (
               <div key={j} className={styles.gridCell}>
+                {/* 不显示坐标 */}
                 {i},{j}
               </div>
             ))}

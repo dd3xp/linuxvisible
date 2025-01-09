@@ -1,0 +1,71 @@
+.statistic-modal {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    width: 600px;
+}
+
+.statistic-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgb(245, 245, 245);
+    border: 1px solid #e0e0e0;
+    cursor: pointer;
+}
+
+.statistic-header:hover {
+    background: rgb(240, 240, 240);
+}
+
+.header-filename {
+    font-family: monospace;
+    font-size: 14px;
+    color: #333;
+}
+
+.header-arrow {
+    margin-left: 8px;
+    color: #666;
+    font-size: 12px;
+}
+
+.info-container {
+    border: 1px solid #e0e0e0;
+    border-top: none;
+    padding: 16px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.info-column {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-label {
+    color: #666;
+    font-size: 14px;
+}
+
+.info-value {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.info-icon {
+    font-size: 14px;
+    margin-left: 4px;
+}

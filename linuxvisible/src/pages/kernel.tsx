@@ -1,241 +1,184 @@
-import { useEffect, useState } from 'react';
-import '../styles/Kernel.css';
-import '../styles/Global.css';
-import ContainerList from './containerlist';
+import {useEffect, useState} from 'react';
+import { addPosToList, calculateKernelContainerPos} from './utils/calculateContainerPos';
+import { getLevel3Color, getUniqueContainers } from './utils/common';
+import { Empty, Modal } from 'antd';
+import StatisticModal from './components/StatisticModal';
+import { EntityNode } from './api/API';
+
+interface VersionInformation {
+    repo: string | null;
+    startVersion: string | null;
+    endVersion: string | null;
+}
 
 interface KernelProps {
-    selected: string | null;
-    onContainerSelect: (component: string | null) => void;
-  }
-  
-  const Kernel: React.FC<KernelProps> = ({ selected, onContainerSelect }) => {
-    
-    const handleClick = (containerName: string, event: React.MouseEvent) => {
-        event.stopPropagation();
-        if (selected === containerName) {
-            onContainerSelect(null);
-        } else {
-            onContainerSelect(containerName);
+    selected: string[] | null,
+    onContainerSelect: (component: string | null, type: string, id?: number) => void,
+    versionInfo: VersionInformation | null,
+    freshFeatureListByVersion?: (repo: string, version1: string, version2: string) => void,
+    freshFeatureListByKgentity?: (repo: string, version1: string, version2: string, eid: number) => void
+}
+
+const Kernel: React.FC<KernelProps> = ({
+                                           selected,
+                                           onContainerSelect,
+                                           versionInfo,
+                                           freshFeatureListByVersion,
+                                           freshFeatureListByKgentity
+                                       }) => {
+    const [contextMessage, setContextMessage] = useState<string | null>(null);
+    const [dynamicCode, setDynamicCode] = useState<JSX.Element | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [containerData, setContainerData] = useState<EntityNode[]>([])
+    const [contextEid, setContextEid] = useState<number | null>(null);
+
+    useEffect(()=>{
+        // step1: 获取json数据
+        const fetchData =async () => {
+            if (versionInfo !== null) {
+                const data = await getUniqueContainers(versionInfo.repo ?? '', versionInfo.startVersion ?? '', versionInfo.endVersion ?? '')
+                setContainerData(data)
+            }
         }
-        console.log(`${containerName} activated`);
+        fetchData()
+    }, [versionInfo])
+
+    useEffect(() => {
+        // 防止每次选择都重新请求json数据
+        addPosToList(containerData)
+        const codeElements: JSX.Element[] = [];
+        for (const container of containerData) {
+            // step2: 计算每个container位置
+            const eid = container.eid
+            const title = container.nameEn
+            const level = container.level
+            const belong_to = container.belongTo ?? -1
+            const belong_to_container = containerData.find((item)=>item.eid===belong_to)
+            const belong_to_name_with_hyphen = (belong_to_container?.nameEn ?? 'linux').replaceAll(' ', '-')
+            const position = calculateKernelContainerPos(eid, level, container.x1, container.y1, container.x2, container.y2, belong_to)
+            // step3: 根据位置生成对应的Element
+            const title_with_hyphen = title.replaceAll(' ', '-')
+            let containerTsx: JSX.Element = <></>;
+            if (level !== 3) {
+                containerTsx = (
+                    <div
+                        key={`${title_with_hyphen}-${level}-${belong_to_name_with_hyphen}`}
+                        className={`${title_with_hyphen} level-${level}-container ${belong_to_name_with_hyphen}-${level}`}
+                        style={{
+                            top: position[0],
+                            bottom: position[1],
+                            left: position[2],
+                            right: position[3]
+                        }}
+                    >
+                        <div className={`level-${level}-title ${belong_to_name_with_hyphen}-title`}>{title}</div>
+                    </div>
+                );
+            } else {
+                // 获取level3节点所在的level1节点
+                const level1_container = containerData.find((item)=>item.eid===belong_to_container?.belongTo)
+                const level3_color = getLevel3Color(level1_container ?? belong_to_container)
+                containerTsx = (
+                    <div
+                        key={`${title_with_hyphen}-${level}-${belong_to_name_with_hyphen}`}
+                        className={`${title_with_hyphen} level-${level}-container ${belong_to_name_with_hyphen}-${level} ${selected?.includes(title_with_hyphen) ? 'selected' : ''}`}
+                        onClick={(e) => handleClick(eid, title_with_hyphen, e)}
+                        onContextMenu={(e) => handleRightClick(title_with_hyphen, e)}
+                        style={{
+                            top: position[0],
+                            bottom: position[1],
+                            left: position[2],
+                            right: position[3],
+                            backgroundColor: level3_color
+                        }}
+                    >
+                        <div className={`level-${level}-title ${belong_to_name_with_hyphen}-title`}>{title}</div>
+                    </div>
+                );
+            }
+            codeElements.push(containerTsx);
+        }
+        if (codeElements.length > 0){
+            setDynamicCode(<>{codeElements}</>)
+        }else{
+            setDynamicCode(<Empty style={{marginTop: '20%'}}/>)
+        }
+    }, [containerData, selected])
+
+    const handleClick = (eid: number, containerName: string, event: React.MouseEvent) => {
+        event.stopPropagation();
+        if (selected?.includes(containerName)) {
+            onContainerSelect(null, 'null');
+            freshFeatureListByVersion?.(versionInfo?.repo ?? '', versionInfo?.startVersion ?? '', versionInfo?.endVersion ?? '');
+        } else {
+            onContainerSelect(containerName, 'module');
+            freshFeatureListByKgentity?.(versionInfo?.repo ?? '', versionInfo?.startVersion ?? '', versionInfo?.endVersion ?? '', eid ?? '');
+        }
     };
 
-    return(
+    const handleRightClick = (containerName: string, event: React.MouseEvent) => {
+        // 阻止默认右键菜单
+        event.preventDefault()
+        // 显示右键菜单
+        const menu: any = document.getElementById('context-menu');
+        menu.style.display = 'block';
+        menu.style.left = (event.pageX - 250) + 'px';
+        menu.style.top = (event.pageY - 10) + 'px';
+        setContextMessage(containerName) // 存储点击的container信息
+        document.addEventListener('click', hideContextMenu);
+        const container = containerData.find(item => 
+            item.nameEn.replaceAll(' ', '-') === containerName
+        );
+        setContextEid(container?.eid ?? null); // 保存找到的 eid
+    }
+
+    // 右键菜单项点击
+    const handleMenuItemClick = (item: string) => {
+        console.log(item)
+        hideContextMenu()
+        if (item === '1') {
+            setIsModalOpen(true)
+        }
+    }
+
+    // 隐藏右键菜单
+    const hideContextMenu = () => {
+        const menu: any = document.getElementById('context-menu');
+        if (menu) {
+            menu.style.display = 'none';
+        }
+    };
+
+    const handleModalCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    return (
         <>
-
-        <div
-        className={`test24 level-3-container test3-3 ${selected === "test24" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test24', e)}
-        >
-            <div className="level-3-title test3-title">test24</div>
-        </div>
-
-        <div
-        className={`test23 level-3-container test3-3 ${selected === "test23" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test23', e)}
-        >
-            <div className="level-3-title test3-title">test23</div>
-        </div>
-
-        <div
-        className={`test22 level-3-container test3-3 ${selected === "test22" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test22', e)}
-        >
-            <div className="level-3-title test3-title">test22</div>
-        </div>
-
-        <div
-        className={`test21 level-3-container test3-3 ${selected === "test21" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test21', e)}
-        >
-            <div className="level-3-title test3-title">test21</div>
-        </div>
-
-        <div
-        className={`test20 level-3-container test3-3 ${selected === "test20" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test20', e)}
-        >
-            <div className="level-3-title test3-title">test20</div>
-        </div>
-
-        <div
-        className={`test19 level-3-container test3-3 ${selected === "test19" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test19', e)}
-        >
-            <div className="level-3-title test3-title">test19</div>
-        </div>
-
-        <div
-        className={`test18 level-3-container test3-3 ${selected === "test18" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test18', e)}
-        >
-            <div className="level-3-title test3-title">test18</div>
-        </div>
-
-        <div
-        className={`test17 level-3-container test3-3 ${selected === "test17" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test17', e)}
-        >
-            <div className="level-3-title test3-title">test17</div>
-        </div>
-
-        <div
-        className={`test16 level-3-container test3-3 ${selected === "test16" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test16', e)}
-        >
-            <div className="level-3-title test3-title">test16</div>
-        </div>
-
-        <div
-        className={`test15 level-3-container test3-3 ${selected === "test15" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test15', e)}
-        >
-            <div className="level-3-title test3-title">test15</div>
-        </div>
-
-        <div
-        className={`test14 level-3-container test3-3 ${selected === "test14" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test14', e)}
-        >
-            <div className="level-3-title test3-title">test14</div>
-        </div>
-
-        <div
-        className={`test13 level-3-container test3-3 ${selected === "test13" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test13', e)}
-        >
-            <div className="level-3-title test3-title">test13</div>
-        </div>
-
-        <div
-        className={`test12 level-3-container test3-3 ${selected === "test12" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test12', e)}
-        >
-            <div className="level-3-title test3-title">test12</div>
-        </div>
-
-        <div
-        className={`test11 level-3-container test3-3 ${selected === "test11" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test11', e)}
-        >
-            <div className="level-3-title test3-title">test11</div>
-        </div>
-
-        <div
-        className={`test10 level-3-container test3-3 ${selected === "test10" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test10', e)}
-        >
-            <div className="level-3-title test3-title">test10</div>
-        </div>
-
-        <div
-        className={`test9 level-3-container test3-3 ${selected === "test9" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test9', e)}
-        >
-            <div className="level-3-title test3-title">test9</div>
-        </div>
-
-        <div
-        className={`test8 level-3-container test3-3 ${selected === "test8" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test8', e)}
-        >
-            <div className="level-3-title test3-title">test8</div>
-        </div>
-
-        <div
-        className={`test7 level-3-container test3-3 ${selected === "test7" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test7', e)}
-        >
-            <div className="level-3-title test3-title">test7</div>
-        </div>
-
-        <div
-        className={`test6 level-3-container test3-3 ${selected === "test6" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test6', e)}
-        >
-            <div className="level-3-title test3-title">test6</div>
-        </div>
-
-        <div
-        className={`test5 level-3-container test3-3 ${selected === "test5" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test5', e)}
-        >
-            <div className="level-3-title test3-title">test5</div>
-        </div>
-
-        <div
-        className={`test4 level-3-container test3-3 ${selected === "test4" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test4', e)}
-        >
-            <div className="level-3-title test3-title">test4</div>
-        </div>
-
-        <div
-        className={`test2 level-3-container test-3 ${selected === "test2" ? 'selected' : ''}`}
-        onClick={(e) => handleClick('test2', e)}
-        >
-            <div className="level-3-title test-title">test2</div>
-        </div>
-
-        <div className="test3 level-2-container Memory-Menagement-2">
-            <div className="level-2-title Memory-Menagement-title">test3</div>
-        </div>
-
-        <div className="test level-2-container tool-2">
-            <div className="level-2-title tool-title">test</div>
-        </div>
-
-        <div className="net level-1-container linux-1">
-            <div className="level-1-title linux-title">net</div>
-        </div>
-
-        <div className="arch level-1-container linux-1">
-            <div className="level-1-title linux-title">arch</div>
-        </div>
-
-        <div className="drivers level-1-container linux-1">
-            <div className="level-1-title linux-title">drivers</div>
-        </div>
-
-        <div className="fs level-1-container linux-1">
-            <div className="level-1-title linux-title">fs</div>
-        </div>
-
-        <div className="Memory-Menagement level-1-container linux-1">
-            <div className="level-1-title linux-title">Memory Menagement</div>
-        </div>
-
-        <div className="kernel level-1-container linux-1">
-            <div className="level-1-title linux-title">kernel</div>
-        </div>
-
-        <div className="ipc level-1-container linux-1">
-            <div className="level-1-title linux-title">ipc</div>
-        </div>
-
-        <div className="sound level-1-container linux-1">
-            <div className="level-1-title linux-title">sound</div>
-        </div>
-
-        <div className="virt level-1-container linux-1">
-            <div className="level-1-title linux-title">virt</div>
-        </div>
-
-        <div className="security level-1-container linux-1">
-            <div className="level-1-title linux-title">security</div>
-        </div>
-
-        <div className="init level-1-container linux-1">
-            <div className="level-1-title linux-title">init</div>
-        </div>
-
-        <div className="crypto level-1-container linux-1">
-            <div className="level-1-title linux-title">crypto</div>
-        </div>
-
-        <div className="tool level-1-container linux-1">
-            <div className="level-1-title linux-title">tool</div>
-        </div>
+            {dynamicCode ? dynamicCode : <Empty style={{marginTop: '20%'}}/>}
+            <div id="context-menu">
+                <ul>
+                    <li onClick={() => handleMenuItemClick('1')}>1</li>
+                    <li onClick={() => handleMenuItemClick('2')}>2</li>
+                </ul>
+            </div>
+            <div className="modal1">
+                <Modal
+                    title={contextMessage}
+                    open={isModalOpen}
+                    zIndex={9999}
+                    onCancel={handleModalCancel}
+                    width={800}
+                >
+                    <StatisticModal 
+                        containerName={contextMessage}
+                        eid={contextEid}
+                        repo={versionInfo?.repo ?? ''}
+                        startVersion={versionInfo?.startVersion ?? ''}
+                        endVersion={versionInfo?.endVersion ?? ''}
+                    />
+                </Modal>
+            </div>
         </>
     )
 }

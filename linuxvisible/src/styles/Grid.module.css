@@ -1,5 +1,3 @@
-@import url("Variable.css");
-
 .gridContainer {
     width: var(--container_width);
     height: var(--container_height);
@@ -16,7 +14,7 @@
   .gridCell {
     width: var(--grid_size);
     height: var(--grid_size);
-    border: 1px solid #e5e7eb;
+    /* border: 1px solid #e5e7eb; */
     display: flex;
     align-items: center;
     justify-content: center;
