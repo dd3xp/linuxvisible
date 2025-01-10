@@ -149,11 +149,14 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
     const [showContent, setShowContent] = useState(false);
     const [companySortWithRetainCodeLines, setCompanySortWithRetainCodeLines] = useState<{ [key: string]: any }[]>([]);
     const [companyLists, setCompanyLists] = useState<string[]>([]);
+    // 默认选择状态为 "按留存代码行数"
+    const [selectedOption, setSelectedOption] = useState<string>("按留存代码行数");
     // 组件初始化或重新打开时重置状态
     useEffect(() => {
         setSelectedType('');
         setShowContent(false);
         setContainerInfo(null);
+        setSelectedOption("按留存代码行数");
         // 只有在有 eid 的时候才获取文件列表
         if (eid) {
             fetchFileList();
@@ -226,7 +229,11 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                 // 统计部分
                 // 默认使用linux-stable仓库
                 const repoPath = repo || 'linux-stable';
-                const type = "4";
+                let type = "4";
+                // if(value === "按特性数") type = "1";
+                // else if(value === "按提交数") type = "2";
+                // else if(value === "按增减代码行数") type = "3";
+                // else if(value === "按留存代码行数") type = "4";
                 // 获取版本对应的 commit
                 // 开始版本
                 const startCommits = await findCommitByVersionList({
@@ -362,6 +369,77 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
         objectFit: 'contain' as const
     };
 
+
+    const options = [
+        "按特性数",
+        "按提交数",
+        "按增减代码行数",
+        "按留存代码行数"
+    ];
+
+    // 处理选择变化
+    const handleSelectChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedOption(event.target.value); // 更新状态
+        console.log("选择了：", event.target.value); // 打印选择结果
+        // handleTypeChange(event.target.value);
+        // await handleTypeChange(event.target.value);
+        let type = "4";
+        if(event.target.value === options[0]) type = "1";
+        else if(event.target.value === options[1]) type = "2";
+        else if(event.target.value === options[2]) type = "3";
+        else if(event.target.value === options[3]) type = "4";
+        const repoPath = repo || 'linux-stable';
+        const versionList = ["v2.6.12","v3.0","v4.0","v5.0","v6.0","v6.6"];
+        const companySortData = await view_file_history({
+            repoPath,
+            filePath: selectedType,
+            type
+        });
+        console.log("companySortData一开始",companySortData);
+        const dictionary_array: { [key: string]: any }[] = [];
+        versionList.forEach((version) => {
+            dictionary_array.push({ version }); // 直接添加对象到一维数组
+        });
+        if (Array.isArray(companySortData)) {
+            console.log("companySortData 是一个数组");
+        }
+        const companyList = [
+            ...new Set(
+                (companySortData as { company: string }[]) // 强制声明类型
+                    .filter(item => item !== null && item.company)
+                    .map(item => item.company)
+            )
+        ];
+        console.log(companyList);
+        dictionary_array.forEach((item) => {
+            companyList.forEach((company) => {
+                item[company] = 0;
+            });
+        });
+        console.log("start to get dictionary_array");
+        console.log(dictionary_array);
+        console.log("start to match the graph data");
+        (companySortData as any[]).forEach((companyItem) => {
+            dictionary_array.forEach((dictItem) => {
+                if (dictItem.version === companyItem.version|| 
+                    dictItem.version === companyItem.version.split('-')[1]) {
+                    console.log("version",dictItem.version,companyItem.version); 
+                    if(type==="4") dictItem[companyItem.company] = companyItem.retainCodeLines;
+                    if(type==="3") dictItem[companyItem.company] = companyItem.totalLine;
+                    if(type==="2") dictItem[companyItem.company] = companyItem.commitCount;
+                    if(type==="1") dictItem[companyItem.company] = companyItem.featureCount;
+                    //console.log(companyItem.company,companyItem.retainCodeLines);
+                    //console.log(dictItem);
+                }
+            });
+        });
+
+        console.log(dictionary_array);
+        setCompanySortWithRetainCodeLines(dictionary_array);
+        setCompanyLists(companyList)
+    };
+
+
     return (
         <>
         <Card 
@@ -465,6 +543,28 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                 style={{ width: '100%', marginTop:'5px' }}
             >
                 <div>柱状图</div>
+                <div style={{ padding: "20px" }}>
+                <label htmlFor="dropdown" style={{ marginRight: "10px" }}>
+                    请选择：
+                </label>
+                <select
+                    id="dropdown"
+                    value={selectedOption}
+                    onChange={handleSelectChange}
+                    style={{
+                        padding: "5px",
+                        fontSize: "14px",
+                        cursor: "pointer"
+                    }}
+                >
+                    {options
+                        .filter((option) => option !== "按留存代码行") // 过滤掉不需要的选项
+                        .map((option, index) => (
+                            <option key={index} value={option}>
+                                {option}
+                            </option>
+                        ))}
+                </select></div>
                 <BarChart
                     width={700}
                     height={500}
