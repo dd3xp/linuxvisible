@@ -4,6 +4,7 @@ import { get } from "../utils/request";
 import { baseUrl } from "../utils/urlConfig";
 import { createHandleCatched, createHandleResponse } from "../utils/response";
 import { stringify } from "querystring";
+import {BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip,Legend} from "recharts";
 
 interface ContainerInfo {
     initialCompany: string;
@@ -120,7 +121,19 @@ function getMaintainers(data: {
         .catch(createHandleCatched(url));
 }
 
-// 柱状图部分
+// 柱状图部分-----------------------------------------------------------------------------------
+function view_file_history(data:{
+    repoPath: string;
+    filePath: string;
+   // VersionList:string[];
+    type: string;
+}){
+    const url = `${baseUrl}/territory/viewFileHistory`;
+    return get(`${url}?${stringify(data)}`)
+        .then(createHandleResponse(url))
+        .catch(createHandleCatched(url));
+}
+//-----------------------------------------------------------------------------------------------
 
 const StatisticModal: React.FC<StatisticModalProps> = ({ 
     containerName,
@@ -134,7 +147,8 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
     const [typeOptions, setTypeOptions] = useState<{ value: string; label: string; }[]>([]);
     const [loading, setLoading] = useState(false);
     const [showContent, setShowContent] = useState(false);
-
+    const [companySortWithRetainCodeLines, setCompanySortWithRetainCodeLines] = useState<{ [key: string]: any }[]>([]);
+    const [companyLists, setCompanyLists] = useState<string[]>([]);
     // 组件初始化或重新打开时重置状态
     useEffect(() => {
         setSelectedType('');
@@ -212,7 +226,7 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                 // 统计部分
                 // 默认使用linux-stable仓库
                 const repoPath = repo || 'linux-stable';
-                
+                const type = "4";
                 // 获取版本对应的 commit
                 // 开始版本
                 const startCommits = await findCommitByVersionList({
@@ -270,7 +284,51 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                     endVersion,
                     repoPath
                 });
-                
+                //按照留存代码排序
+                const versionList = ["v2.6.12","v3.0","v4.0","v5.0","v6.0","v6.6"];
+                const companySortData = await view_file_history({
+                    repoPath,
+                    filePath: value,
+                    type
+                });
+                console.log(companySortData);
+                const dictionary_array: { [key: string]: any }[] = [];
+                versionList.forEach((version) => {
+                    dictionary_array.push({ version }); // 直接添加对象到一维数组
+                });
+                if (Array.isArray(companySortData)) {
+                    console.log("companySortData 是一个数组");
+                }
+                const companyList = [
+                    ...new Set(
+                        (companySortData as { company: string }[]) // 强制声明类型
+                            .filter(item => item !== null && item.company)
+                            .map(item => item.company)
+                    )
+                ];
+                console.log(companyList);
+                dictionary_array.forEach((item) => {
+                    companyList.forEach((company) => {
+                        item[company] = 0;
+                    });
+                });
+                console.log("start to get dictionary_array");
+                console.log(dictionary_array);
+                console.log("start to match the graph data");
+                (companySortData as any[]).forEach((companyItem) => {
+                    dictionary_array.forEach((dictItem) => {
+                        if (dictItem.version === companyItem.version) {
+                            console.log("version",dictItem.version,companyItem.version); 
+                            dictItem[companyItem.company] = companyItem.retainCodeLines;
+                            //console.log(companyItem.company,companyItem.retainCodeLines);
+                            //console.log(dictItem);
+                        }
+                    });
+                });
+
+                console.log(dictionary_array);
+                setCompanySortWithRetainCodeLines(dictionary_array);
+                setCompanyLists(companyList)
                 setShowContent(true);
                 setContainerInfo({
                     initialCompany: originMessage?.originCompanyName || '未知公司',
@@ -282,6 +340,7 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                         maintainers.data?.additionalProp2?.[0] || 
                         maintainers.data?.additionalProp3?.[0]) ?? '暂无维护者'
                     });
+                    //barchart_data_retainCodeLines:company_sort_with_retainCodeLines.data
                 } catch (error) {
                     console.error('公司获取错误：', error);
                     setShowContent(false);
@@ -406,6 +465,29 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                 style={{ width: '100%', marginTop:'5px' }}
             >
                 <div>柱状图</div>
+                <BarChart
+                    width={700}
+                    height={500}
+                    data={companySortWithRetainCodeLines}
+                    margin={{
+                        top: 20,
+                        right: 30,
+                        left: 20,
+                        bottom: 5
+                    }}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="version" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    {/* 每个公司用不同的 Bar */}
+                    <Bar dataKey={companyLists[0]} fill="#8884d8" />
+                    <Bar dataKey={companyLists[1]} fill="#82ca9d" />
+                    <Bar dataKey={companyLists[2]} fill="#ffc658" />
+                    <Bar dataKey={companyLists[3]} fill="#d84f4f" />
+                    <Bar dataKey={companyLists[4]} fill="#4fd8d8" />
+                </BarChart>
             </Card>
         )}
         </>
