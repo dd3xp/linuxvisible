@@ -268,7 +268,7 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                     startVersion,
                     endVersion
                 });
-
+                console.log("我是张吉米",maxFeature);
                 // 最多提交的公司
                 const maxCommit = await findMaxCommitCompany({
                     repoPath,
@@ -291,6 +291,7 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                     endVersion,
                     repoPath
                 });
+                console.log("维修工张吉米",maintainers);
                 //按照留存代码排序
                 const versionList = ["v2.6.12","v3.0","v4.0","v5.0","v6.0","v6.6"];
                 const companySortData = await view_file_history({
@@ -339,13 +340,13 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                 setShowContent(true);
                 setContainerInfo({
                     initialCompany: originMessage?.originCompanyName || '未知公司',
-                    mostFeatureCodeCompany: maxFeature.data ?? '暂无公司提供特性',
-                    mostCommitCompany: maxCommit.data ?? '暂无公司提交代码',
-                    mostLayerCodeCompany: maxAddAndDel.data ?? '暂无公司增减代码',
+                    mostFeatureCodeCompany: maxFeature ?? '暂无公司提供特性',
+                    mostCommitCompany: maxCommit?? '暂无公司提交代码',
+                    mostLayerCodeCompany: maxAddAndDel ?? '暂无公司增减代码',
                     mostExistCompany: maxRetainCompany ?? '暂无公司留存代码',
-                    maintainerCompany: (maintainers.data?.additionalProp1?.[0] || 
-                        maintainers.data?.additionalProp2?.[0] || 
-                        maintainers.data?.additionalProp3?.[0]) ?? '暂无维护者'
+                    maintainerCompany: (maintainers?.additionalProp1?.[0] || 
+                        maintainers?.additionalProp2?.[0] || 
+                        maintainers?.additionalProp3?.[0]) ?? '暂无维护者'
                     });
                     //barchart_data_retainCodeLines:company_sort_with_retainCodeLines.data
                 } catch (error) {
@@ -385,7 +386,7 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
         // await handleTypeChange(event.target.value);
         let type = "4";
         if(event.target.value === options[0]) type = "1";
-        else if(event.target.value === options[1]) type = "2";
+        else if(event.target.value === options[1]) type = "5";
         else if(event.target.value === options[2]) type = "3";
         else if(event.target.value === options[3]) type = "4";
         const repoPath = repo || 'linux-stable';
@@ -426,7 +427,7 @@ const StatisticModal: React.FC<StatisticModalProps> = ({
                     console.log("version",dictItem.version,companyItem.version); 
                     if(type==="4") dictItem[companyItem.company] = companyItem.retainCodeLines;
                     if(type==="3") dictItem[companyItem.company] = companyItem.totalLine;
-                    if(type==="2") dictItem[companyItem.company] = companyItem.commitCount;
+                    if(type==="5") dictItem[companyItem.company] = companyItem.commitCount;
                     if(type==="1") dictItem[companyItem.company] = companyItem.featureCount;
                     //console.log(companyItem.company,companyItem.retainCodeLines);
                     //console.log(dictItem);

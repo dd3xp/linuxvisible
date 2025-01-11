@@ -7,7 +7,7 @@ import { parse, stringify } from 'querystring';
 
 const http = axios.create({
     baseURL :  "",
-    timeout : 5000
+    timeout : 15000
 })
 
 // 在发送请求之前拦截 插入自定义配置 对于参数的处理
