@@ -1,7 +1,7 @@
 import { stringify } from "querystring";
-import { get, post } from "../../utils/request";
-import { baseUrl } from "../../utils/urlConfig";
-import { createHandleCatched, createHandleResponse} from "../../utils/response";
+import { get, post } from "../utils/request";
+import { baseUrl } from "../utils/urlConfig";
+import { createHandleCatched, createHandleResponse} from "../utils/response";
 
 /**
  * versionList可以有3种情况:

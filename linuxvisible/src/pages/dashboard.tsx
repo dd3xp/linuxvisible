@@ -1,9 +1,9 @@
 import {useEffect, useState} from 'react';
 import Kernel from './kernel';
-import Grid from './grid';
+import Grid from './edit/grid';
 import ContainerList from './containerlist';
-import {getFeatureListByEid, getFeatureListByVersion, getFeatureModules} from './api/services/feature';
-import {message} from "antd";
+import {getFeatureListByEid, getFeatureListByVersion, getFeatureModules} from '../services/feature';
+
 
 interface VersionInformation {
     repo: string | null;
@@ -21,13 +21,22 @@ const Dashboard: React.FC = () => {
     const [selected, setSelectedContainer] = useState<string[] | null>(null);
     const [versionInfo, setVersionInfo] = useState<VersionInformation | null>(null)
     const [containers, setContainers] = useState<Container[]>([]);
+    const [circleActiveState, setCircleActiveState] = useState<Record<string, boolean>>({
+        特性贡献: false,
+        提交贡献: false,
+        代码贡献: false,
+        Maintainer贡献: false,
+    });
+    const [companyList, setCompanyList] = useState<string>('')
 
 
-    const handleContainerSelect = async (component: string | null, type: string, id?: number) => {
+    const handleContainerSelect = async (component: string | null,type: string, id?: number) => {
         if (component !== null) {
+            localStorage.setItem('selectedFeatureId', String(id));
+            console.log("i set id",id);
             const components: string[] = [component];
             if (type === 'list' && id !== undefined) {
-                const response = await getFeatureModules({featureId: id});
+                const response = await getFeatureModules({featureId: id, repo: versionInfo?.repo ?? ''});
                 if (Array.isArray(response)) {
                     response.forEach((item: { nameEn: string }) =>
                         components.push(item.nameEn.replace(/&/g, 'and').replace(/\//g, '').replace(/ /g, '-'))
@@ -48,22 +57,22 @@ const Dashboard: React.FC = () => {
         })
     }
 
+    const onCompanyChange = (company: string) => {
+        setCompanyList(company)
+    }
+
     const handleDocumentClick = (event: MouseEvent) => {
+        const target = event.target as HTMLElement;
         if (!event.target || !(event.target instanceof HTMLElement)) return;
         if (
-            !event.target.closest('.kernel-container') &&
-            !event.target.closest('.container-list')
+            event.target.closest('.version-select')&&
+            target.tagName === "SPAN" && target.innerText === "确 认"
         ) {
             setSelectedContainer(null);
         }
     };
 
     const freshFeatureListByVersion = (repo: string, version1: string, version2: string) => {
-        if ((version1 && version2 && version1 > version2) || (version1 && version2 && version1 > version2)) {
-            message.error("开始版本不能大于结束版本！");
-            return;
-        }
-
         // 获取特性列表
         getFeatureListByVersion({
             repo: repo ?? '',
@@ -113,18 +122,31 @@ const Dashboard: React.FC = () => {
     return (
         <div className="screen">
             <div>
-                <ContainerList selected={selected} onContainerSelect={handleContainerSelect}
-                               onVersionSelect={onVersionSelect} freshFeatureListByVersion={freshFeatureListByVersion}
-                               containers={containers}/>
+                <ContainerList 
+                    selected={selected} 
+                    onContainerSelect={handleContainerSelect}
+                    onVersionSelect={onVersionSelect}
+                    freshFeatureListByVersion={freshFeatureListByVersion}
+                    circleActiveState={circleActiveState}
+                    setCircleActiveState={setCircleActiveState}
+                    onCompanyChange={onCompanyChange}
+                    containers={containers}/>
             </div>
             <div className="overlay-container">
+                {/* 这个页面将不再需要Grid
                 <div className="grid">
                     <Grid/>
                 </div>
+                */}
                 <div className="linux">
-                    <Kernel selected={selected} onContainerSelect={handleContainerSelect} versionInfo={versionInfo}
-                            freshFeatureListByVersion={freshFeatureListByVersion}
-                            freshFeatureListByKgentity={freshFeatureListByKgentity}/>
+                    <Kernel 
+                        selected={selected} 
+                        onContainerSelect={handleContainerSelect} 
+                        versionInfo={versionInfo}
+                        freshFeatureListByVersion={freshFeatureListByVersion}
+                        circleActiveState={circleActiveState}
+                        companyList={companyList}
+                        freshFeatureListByKgentity={freshFeatureListByKgentity}/>
                 </div>
             </div>
         </div>

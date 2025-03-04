@@ -1,16 +1,16 @@
-import { EntityNode } from "../api/API";
+import { EntityNode } from "./API";
 
 // 单元化网格
-export const linuxSize: [number, number] = [1400, 750]; // 直接定义为元组
-export const gridSize: number = 50;
+export const linuxSize: [number, number] = [1560, 884]; // 直接定义为元组
+export const gridSize: number = 52;
 const colAmount: number = linuxSize[0] / gridSize;
 const rowAmount: number = linuxSize[1] / gridSize;
 const maxLevel: number = 3;
 
 // 设置边距
-const level1Margin: number = 6;
-const level2Margin: number = 8.7;
-const level3Margin: number = 11.4;
+const level1Margin: number = 5;
+const level2Margin: number = 7;
+const level3Margin: number = 9;
 const titleSize: number = 12;
 
 // 组件字典
@@ -60,6 +60,7 @@ export const getPosition = (coordinate: number[], margin: number, belong_to: num
 
     if (!parents_coordinate) {
         console.error(`没有找到归属于 '${belong_to}' 的父坐标。请检查容器名称。`);
+        return [0, 0, 0, 0]
     }
 
     let top_margin = margin;

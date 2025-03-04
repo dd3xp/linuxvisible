@@ -34,7 +34,7 @@
 .contributionSection {
     display: flex;
     flex-direction: column;
-    align-items: center; /* 垂直居中对齐 */
+    align-items: left; /* 垂直居中对齐 */
     width: 100%; /* 占据全宽，方便自适应 */
     margin-top: 20px;
 }

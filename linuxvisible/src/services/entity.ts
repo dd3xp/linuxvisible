@@ -1,7 +1,7 @@
 import { stringify } from "querystring";
-import { get } from "../../utils/request";
-import { baseUrl } from "../../utils/urlConfig";
-import { createHandleCatched, createHandleResponse} from "../../utils/response";
+import { get } from "../utils/request";
+import { baseUrl } from "../utils/urlConfig";
+import { createHandleCatched, createHandleResponse} from "../utils/response";
 
 export function getEntities(
     data: {

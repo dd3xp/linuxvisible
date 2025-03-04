@@ -1,124 +1,170 @@
 :root {
-    --container_width: 1400px;
-    --container_height: 750px;
-    --grid_size: 50px;
-    --grid_opacity:0.5;
-    --list_width: 200px;
-    --list_height:450px;
-  }
+  --container_width: 1560px;
+  --container_height: 884px;
+  --grid_size: 52px;
+  --grid_opacity:0.5;
+  --list_width: 200px;
+  --list_height:450px;
+}
 
 .level-1-container {
-    font-size: 10;
-    position: absolute;
-    border: 1px solid #000000;
-    z-index: 999
+  font-size: 14px;
+  position: absolute;
+  border: 1px solid grey;
+  z-index: 997
 }
 
 .level-2-container {
-    font-size: 10;
-    position: absolute;
-    border: 1px solid #000000;
-    z-index: 998
+  font-size: 12px;
+  position: absolute;
+  border: 1px solid rgb(176, 174, 174);
+  z-index: 998
 }
 
 .level-3-container {
-    background-color: #cce4b4;
-    cursor: pointer;
-    font-size: 10;
-    position: absolute;
-    border: none;
-    z-index: 999;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  position: absolute;
+  border: none;
+  z-index: 999;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.level-3-title {
+  word-break: break-word;
 }
 
 .overlay-container {
-    position: relative;
-    width: var(--container_width);
-    height: var(--container_height);
-    margin-left: 20px;
+  position: relative;
+  width: var(--container_width);
+  height: var(--container_height);
+  margin-left: 20px;
 }
 
 .grid {
-    position: absolute;
-    opacity: var(--grid_opacity);
-    top: 0;
-    left: 0;
-    width: var(--container_width);
-    height: var(--container_height);
+  position: absolute;
+  opacity: var(--grid_opacity);
+  top: 0;
+  left: 0;
+  width: var(--container_width);
+  height: var(--container_height);
+  z-index: 999;
 }
 
 .linux{
-    position: absolute;
-    width: var(--container_width);
-    height: var(--container_height);
-    margin-left: 20px;
-    border: 1px solid lightgray;
+  position: absolute;
+  width: var(--container_width);
+  height: var(--container_height);
+  margin-left: 20px;
+  border: 1px solid lightgray;
 }
 
 .screen{
-    display: flex; /* 使用 flex 布局 */
-    flex-wrap: wrap; /* 如果需要，允许换行 */
-    align-items:flex-start; /* 垂直居中对齐 */
+  margin: 20px;
+  display: flex; /* 使用 flex 布局 */
+  flex-wrap: wrap; /* 如果需要，允许换行 */
 }
 
 .version-operation {
-    display: flex;
-    justify-content: flex-start; /* 使内容靠左 */
-    align-items: center; /* 垂直居中 */
-    height: 100vh; /* 设置容器高度为视口高度 */
-    padding-left: 20px; /* 给容器添加左侧内边距，使文字更靠近左侧 */
+  display: flex;
+  justify-content: flex-start; /* 使内容靠左 */
+  align-items: center; /* 垂直居中 */
+  height: 100vh; /* 设置容器高度为视口高度 */
+  padding-left: 20px; /* 给容器添加左侧内边距，使文字更靠近左侧 */
 }
 
 .version-operation-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #333;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
 }
 
 .feature-selected {
-    background-color: #e4f4fc;
-    color: #007bff;
+  background-color: #e4f4fc;
+  color: #007bff;
 }
 
 .selected {
-    background-color: #007bff !important;
-    color: white;
+  background-color: #007bff !important;
+  color: white;
 }
 
 #context-menu {
-    display: none;
-    position: absolute;
-    font-size: 14px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    background-color: white;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    z-index: 9999;
+  display: none;
+  position: absolute;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: white;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
 }
 
 .modal-open #context-menu {
-    display: none; /* 当模态框打开时隐藏右键菜单 */
+  display: none; /* 当模态框打开时隐藏右键菜单 */
 }
 
 #context-menu ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 #context-menu ul li {
-    padding: 8px 12px;
-    cursor: pointer;
+  padding: 8px 12px;
+  cursor: pointer;
 }
 #context-menu ul li:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
+}
+
+#feature-context-menu {
+  display: none;
+  position: absolute;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: white;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+}
+
+.modal-open #feature-context-menu {
+  display: none; /* 当模态框打开时隐藏右键菜单 */
+}
+
+#feature-context-menu ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+#feature-context-menu ul li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+#feature-context-menu ul li:hover {
+  background-color: #f0f0f0;
 }
 
 .company-logo {
-    border-radius: 5px; /* 圆角效果 */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
-    object-fit: cover; /* 确保图片比例一致 */
+  border-radius: 5px; /* 圆角效果 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+  object-fit: cover; /* 确保图片比例一致 */
+}
+
+.g6-tooltip {
+  border: 1px solid #e2e2e2;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #545454;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 10px 8px;
+  box-shadow: rgb(174, 174, 174) 0px 0px 10px;
+}
+
+.circle-clip {
+  clip-path: circle(50% at 50% 50%);
 }
