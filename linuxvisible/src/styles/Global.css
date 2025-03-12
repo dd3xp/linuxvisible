@@ -1,21 +1,21 @@
 :root {
-  --container_width: 1560px;
-  --container_height: 884px;
-  --grid_size: 52px;
+  --container_width: 1600px;
+  --container_height: 880px;
+  --grid_size: 40px;
   --grid_opacity:0.5;
   --list_width: 200px;
   --list_height:450px;
 }
 
 .level-1-container {
-  font-size: 14px;
+  font-size: 12px;
   position: absolute;
   border: 1px solid grey;
   z-index: 997
 }
 
 .level-2-container {
-  font-size: 12px;
+  font-size: 9px;
   position: absolute;
   border: 1px solid rgb(176, 174, 174);
   z-index: 998
@@ -23,7 +23,7 @@
 
 .level-3-container {
   cursor: pointer;
-  font-size: 10px;
+  font-size: 7px;
   position: absolute;
   border: none;
   z-index: 999;
@@ -52,7 +52,6 @@
   left: 0;
   width: var(--container_width);
   height: var(--container_height);
-  z-index: 999;
 }
 
 .linux{

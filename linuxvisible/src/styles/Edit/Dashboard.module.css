@@ -1,0 +1,22 @@
+.dashboardContainer {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    padding: 20px;
+}
+
+.mainContent {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.overlay {
+    display: grid;
+    grid-template-areas: "stack";
+    width: var(--container_width);
+    height: var(--container_height);
+    position: absolute;
+}

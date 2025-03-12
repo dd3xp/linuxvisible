@@ -1,21 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { addPosToList, calculateKernelContainerPos } from '../../utils/calculateContainerPos';
-import { getLevel3Color, getLocalContainers, getUniqueContainers } from '../../utils/common';
+import { getLevel3Color, getUniqueContainers } from '../../utils/common';
 import { Empty } from 'antd';
 import { EntityNode } from '../../utils/API';
-import styles from "../styles/ContainerList.module.css";
 
-const Kernel: React.FC = () => {
+interface VersionInformation {
+    repo: string | null;
+    version: string | null;
+}
+
+interface KernelProps {
+    versionInfo: VersionInformation | null;
+    setFeatureName: (name: string) => void;
+    selectedKernel: number | null;
+    setSelectedKernel: (id: number | null) => void;
+}
+
+const Kernel: React.FC<KernelProps> = ({ versionInfo, setFeatureName, selectedKernel, setSelectedKernel }) => {
     const [containerData, setContainerData] = useState<EntityNode[]>([]);
     const [staticRender, setStaticRender] = useState<JSX.Element | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getLocalContainers();
+            if (!versionInfo?.repo || !versionInfo?.version) return;
+
+            const data = await getUniqueContainers(versionInfo.repo ?? '', versionInfo.version ?? '', versionInfo.version ?? '');
             setContainerData(data);
         };
         fetchData();
-    }, []);
+    }, [versionInfo]);
 
     useEffect(() => {
         addPosToList(containerData);
@@ -43,7 +56,9 @@ const Kernel: React.FC = () => {
                             right: position[3]
                         }}
                     >
-                        <div className={`level-${level}-title ${belong_to_name}-title`}>{nameEn}</div>
+                        <div className={`level-${level}-title ${belong_to_name}-title`}>
+                            {nameEn}
+                        </div>
                     </div>
                 );
             } else {
@@ -59,10 +74,22 @@ const Kernel: React.FC = () => {
                             bottom: position[1],
                             left: position[2],
                             right: position[3],
-                            backgroundColor: level3_color
+                            backgroundColor: selectedKernel === eid ? 'red' : level3_color,
+                            cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                            if (selectedKernel === eid) {
+                                setSelectedKernel(null);
+                                setFeatureName('');
+                            } else {
+                                setSelectedKernel(eid);
+                                setFeatureName(nameEn);
+                            }
                         }}
                     >
-                        <div className={`level-${level}-title ${belong_to_name}-title`}>{nameEn}</div>
+                        <div className={`level-${level}-title ${belong_to_name}-title`}>
+                            {nameEn}
+                        </div>
                     </div>
                 );
             }
@@ -70,9 +97,9 @@ const Kernel: React.FC = () => {
         }
 
         setStaticRender(elements.length > 0 ? <>{elements}</> : <Empty style={{ marginTop: '20%' }} />);
-    }, [containerData]);
+    }, [containerData, selectedKernel]);
 
-    return <>{staticRender}</>;
+    return <div>{staticRender}</div>;
 };
 
 export default Kernel;

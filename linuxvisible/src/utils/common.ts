@@ -22,8 +22,6 @@ export const getLocalContainers = async (): Promise<EntityNode[]> => {
         const response = await fetch('/6.1.json');
         const rawData: any[][] = await response.json();
 
-        console.log("从 6.1.json 读取的内容：", rawData);
-
         const filteredData = rawData.filter(item => Array.isArray(item) && item.length === 7);
         const formattedData: EntityNode[] = filteredData.map(item => ({
             eid: item[0],
@@ -39,7 +37,7 @@ export const getLocalContainers = async (): Promise<EntityNode[]> => {
         console.log("格式化后的数据：", formattedData);
         return formattedData;
     } catch (error) {
-        console.error("加载6.1.json失败:", error);
+        console.error("加载失败:", error);
         return [];
     }
 };

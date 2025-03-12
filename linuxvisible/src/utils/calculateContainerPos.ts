@@ -1,8 +1,8 @@
 import { EntityNode } from "./API";
 
 // 单元化网格
-export const linuxSize: [number, number] = [1560, 884]; // 直接定义为元组
-export const gridSize: number = 52;
+export const linuxSize: [number, number] = [1600, 880]; // 直接定义为元组
+export const gridSize: number = 40;
 const colAmount: number = linuxSize[0] / gridSize;
 const rowAmount: number = linuxSize[1] / gridSize;
 const maxLevel: number = 3;
