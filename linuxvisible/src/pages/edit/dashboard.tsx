@@ -116,6 +116,9 @@ const Dashboard: React.FC = () => {
                                 value={featureName}
                                 onChange={(e) => setFeatureName(e.target.value)}
                             />
+                        <Button type="primary" style={{ marginTop: 10 }} onClick={handleConfirmFeature}>
+                            确认
+                        </Button>
                         </Form.Item>
                         <Form.Item label="左键选中的坐标">
                             <div>{leftSelected ? `(${leftSelected.row}, ${leftSelected.col})` : '未选择'}</div>
@@ -123,11 +126,8 @@ const Dashboard: React.FC = () => {
                         <Form.Item label="右键选中的坐标">
                             <div>{rightSelected ? `(${rightSelected.row}, ${rightSelected.col})` : '未选择'}</div>
                         </Form.Item>
-                        <Button type="primary" onClick={handleConfirmFeature}>
-                            确认
-                        </Button>
-                        <Button style={{ marginTop: 10 }} onClick={handleSaveEditing}>
-                            保存编辑
+                        <Button type="primary" onClick={handleSaveEditing}>
+                            清除
                         </Button>
                     </Form>
                 </div>
