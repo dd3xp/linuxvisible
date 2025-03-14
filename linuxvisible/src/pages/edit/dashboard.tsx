@@ -117,7 +117,7 @@ const Dashboard: React.FC = () => {
                                 onChange={(e) => setFeatureName(e.target.value)}
                             />
                         <Button type="primary" style={{ marginTop: 10 }} onClick={handleConfirmFeature}>
-                            确认
+                            修改
                         </Button>
                         </Form.Item>
                         <Form.Item label="左键选中的坐标">

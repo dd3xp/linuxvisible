@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import styles from '../../styles/Grid.module.css';
+import styles from '../../styles/Edit/Grid.module.css';
 import { gridSize, linuxSize } from '../../utils/calculateContainerPos';
 
 interface GridProps {
