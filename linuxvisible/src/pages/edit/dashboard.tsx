@@ -5,6 +5,7 @@ import { Empty } from 'antd';
 import styles from '../../styles/Edit/Dashboard.module.css';
 import Kernel from './kernel';
 import Grid from './grid';
+import React from 'react';
 
 interface VersionInformation {
     repo: string | null;
@@ -18,8 +19,6 @@ const Dashboard: React.FC = () => {
     const [versionList, setVersionList] = useState<string[]>([]);
     const [showContent, setShowContent] = useState(false);
     const [featureName, setFeatureName] = useState<string>('');
-    const [leftSelected, setLeftSelected] = useState<{ row: number; col: number } | null>(null);
-    const [rightSelected, setRightSelected] = useState<{ row: number; col: number } | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [selectedKernel, setSelectedKernel] = useState<number | null>(null);
     const [resetTrigger, setResetTrigger] = useState<boolean>(false);
@@ -62,8 +61,6 @@ const Dashboard: React.FC = () => {
 
     const handleSaveEditing = () => {
         setIsEditing(false);
-        setLeftSelected(null);
-        setRightSelected(null);
         setSelectedKernel(null);
         setFeatureName('');
         setResetTrigger(false);
@@ -92,7 +89,7 @@ const Dashboard: React.FC = () => {
                                 value={versionInfo?.version}
                                 onChange={handleVersionChange}
                                 allowClear
-                                options={versionList.map((v) => ({ value: v, label: v }))}
+                                options={versionList.map((v) => ({ value: v, label: v }))} 
                             />
                         </Form.Item>
                         <Form.Item>
@@ -120,12 +117,6 @@ const Dashboard: React.FC = () => {
                             修改
                         </Button>
                         </Form.Item>
-                        <Form.Item label="左键选中的坐标">
-                            <div>{leftSelected ? `(${leftSelected.row}, ${leftSelected.col})` : '未选择'}</div>
-                        </Form.Item>
-                        <Form.Item label="右键选中的坐标">
-                            <div>{rightSelected ? `(${rightSelected.row}, ${rightSelected.col})` : '未选择'}</div>
-                        </Form.Item>
                         <Button type="primary" onClick={handleSaveEditing}>
                             清除
                         </Button>
@@ -146,8 +137,6 @@ const Dashboard: React.FC = () => {
                     {showContent ? (
                         <>
                             <Grid 
-                                setLeftSelected={setLeftSelected} 
-                                setRightSelected={setRightSelected} 
                                 isEditing={isEditing} 
                                 resetSelection={resetTrigger} 
                             />

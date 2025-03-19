@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true
   },
   // 打包相关配置
-  output: 'export',
+  // output: 'export',
   distDir: 'dist',
   images: {
     unoptimized: true,

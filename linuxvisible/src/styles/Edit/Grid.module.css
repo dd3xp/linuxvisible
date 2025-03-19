@@ -3,8 +3,8 @@
   height: var(--container_height);
   border: 1px solid #e5e7eb;
   background-color: white;
-  z-index: 999;
-  opacity: 0.5;
+  z-index: 0;
+  opacity: var(--grid_opacity);
   display: flex;
   flex-direction: column;
 }
@@ -22,47 +22,41 @@
   align-items: center;
   justify-content: center;
   font-size: 0.75rem;
-  cursor: pointer;
+  cursor: default;
   background-color: transparent;
   transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, filter 0.2s ease-in-out;
   outline: none;
 }
 
 .gridCell:hover {
-  filter: brightness(5%);
-}
-
-.active {
-  background-color: #b1d3f7;
-  color: white;
-  font-weight: bold;
-  transform: scale(0.9);
+  border:2px solid #595a5a;
 }
 
 .gridCell:active {
   transform: scale(0.9);
 }
 
-.activeLeft {
-  background-color: #66b3ff;
+.selectionBox {
+  position: absolute;
+  border: 2px dashed #178bff;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.activeRight {
-  background-color: #ff6e6e;
+.hoverActive {
+  background-color: rgba(102, 179, 255, 0.4);
+  border-color: #66b3ff;
 }
 
-.activeBoth {
-  background-color: #fe86fe;
+.finalActive {
+  background-color: rgba(102, 179, 255, 0.7);
+  border-color: #0056b3;
 }
 
-.activeLeft:hover {
-  filter: brightness(85%);
-}
-
-.activeRight:hover {
-  filter: brightness(85%);
-}
-
-.activeBoth:hover {
-  filter: brightness(85%);
+.gridCell.disabled {
+  background-color: transparent !important;
+  border: none !important;
+  color: inherit !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important; /* 彻底禁用 hover、点击 */
 }

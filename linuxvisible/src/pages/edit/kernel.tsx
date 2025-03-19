@@ -24,11 +24,20 @@ const Kernel: React.FC<KernelProps> = ({ versionInfo, setFeatureName, selectedKe
         const fetchData = async () => {
             if (!versionInfo?.repo || !versionInfo?.version) return;
 
-            const data = await getUniqueContainers(versionInfo.repo ?? '', versionInfo.version ?? '', versionInfo.version ?? '');
-            setContainerData(data);
+            try {
+                // console.log("🔹 获取数据中...");
+                const fetchedData = await getUniqueContainers(versionInfo.repo, versionInfo.version, versionInfo.version);
+                // console.log("📄 获取的 JSON 数据:", fetchedData);
+
+                let jsonDataVariable = fetchedData;
+                // console.log("🔍 变量存储的 JSON:", jsonDataVariable);
+                setContainerData(jsonDataVariable);
+            } catch (error) {
+                // console.error("❌ 处理 JSON 失败:", error);
+            }
         };
         fetchData();
-    }, [versionInfo]);
+    }, [versionInfo]);    
 
     useEffect(() => {
         addPosToList(containerData);

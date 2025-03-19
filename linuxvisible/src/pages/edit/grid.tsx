@@ -1,15 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from '../../styles/Edit/Grid.module.css';
 import { gridSize, linuxSize } from '../../utils/calculateContainerPos';
 
 interface GridProps {
-    setLeftSelected: (pos: { row: number; col: number } | null) => void;
-    setRightSelected: (pos: { row: number; col: number } | null) => void;
     isEditing: boolean;
     resetSelection: boolean;
 }
 
-const Grid: React.FC<GridProps> = ({ setLeftSelected, setRightSelected, isEditing, resetSelection }) => {
+const Grid: React.FC<GridProps> = ({ isEditing, resetSelection }) => {
     const WIDTH = linuxSize[0];
     const HEIGHT = linuxSize[1];
     const GRID = gridSize;
@@ -17,79 +15,134 @@ const Grid: React.FC<GridProps> = ({ setLeftSelected, setRightSelected, isEditin
     const COLS = WIDTH / GRID;
     const ROWS = HEIGHT / GRID;
 
-    // 记录左键和右键选中的位置
-    const [leftSelected, setLocalLeftSelected] = useState<{ row: number; col: number } | null>(null);
-    const [rightSelected, setLocalRightSelected] = useState<{ row: number; col: number } | null>(null);
+    const gridRef = useRef<HTMLDivElement | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+    const [selectionBox, setSelectionBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+    const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
 
-    const handleCellClick = (row: number, col: number, isRightClick = false) => {
-        if (isRightClick) {
-            if (rightSelected && rightSelected.row === row && rightSelected.col === col) {
-                setLocalRightSelected(null);
-                setRightSelected(null);
-            } else {
-                setLocalRightSelected({ row, col });
-                setRightSelected({ row, col });
-            }
-        } else {
-            if (leftSelected && leftSelected.row === row && leftSelected.col === col) {
-                setLocalLeftSelected(null);
-                setLeftSelected(null);
-            } else {
-                setLocalLeftSelected({ row, col });
-                setLeftSelected({ row, col });
-            }
-        }
+    // 记录框选过程中选中的按钮
+    const [hoverSelectedCells, setHoverSelectedCells] = useState<Set<string>>(new Set());
+    // 记录鼠标松开时最终选中的按钮
+    const [finalSelectedCells, setFinalSelectedCells] = useState<Set<string>>(new Set());
+
+    // 获取鼠标相对 Grid 容器的位置
+    const getRelativePosition = (event: MouseEvent) => {
+        if (!gridRef.current) return { x: 0, y: 0 };
+        const rect = gridRef.current.getBoundingClientRect();
+        return {
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+        };
     };
 
+    // 获取按钮的坐标范围
+    const getCellBounds = (row: number, col: number) => ({
+        left: col * GRID,
+        top: row * GRID,
+        right: (col + 1) * GRID,
+        bottom: (row + 1) * GRID,
+    });
+
+    // 判断按钮是否被框选到（部分覆盖也算）
+    const isCellIntersecting = (cell: { left: number; top: number; right: number; bottom: number }, box: { left: number; top: number; width: number; height: number }) => {
+        const boxRight = box.left + box.width;
+        const boxBottom = box.top + box.height;
+        return !(
+            cell.left > boxRight || 
+            cell.right < box.left || 
+            cell.top > boxBottom || 
+            cell.bottom < box.top
+        );
+    };
+
+    // 鼠标按下 -> 开始框选（仅在 `isEditing === true` 时生效）
+    const handleMouseDown = (event: React.MouseEvent) => {
+        if (!isEditing) return; 
+        const { x, y } = getRelativePosition(event.nativeEvent);
+        setStartPoint({ x, y });
+        setIsDragging(true);
+        setSelectionBox({ left: x, top: y, width: 0, height: 0 });
+        setHoverSelectedCells(new Set());
+    };
+
+    // 鼠标移动 -> 更新选框和"框选中的按钮"
+    const handleMouseMove = (event: React.MouseEvent) => {
+        if (!isDragging || !startPoint || !isEditing) return;
+
+        const { x, y } = getRelativePosition(event.nativeEvent);
+        const newSelectionBox = {
+            left: Math.min(x, startPoint.x),
+            top: Math.min(y, startPoint.y),
+            width: Math.abs(x - startPoint.x),
+            height: Math.abs(y - startPoint.y),
+        };
+        setSelectionBox(newSelectionBox);
+
+        // 计算当前框选到的按钮
+        const newHoverSelectedCells = new Set<string>();
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const cell = getCellBounds(r, c);
+                if (isCellIntersecting(cell, newSelectionBox)) {
+                    newHoverSelectedCells.add(`${r}-${c}`);
+                }
+            }
+        }
+        setHoverSelectedCells(newHoverSelectedCells);
+    };
+
+    // 鼠标释放 -> 记录最终选中的按钮
+    const handleMouseUp = () => {
+        if (!isEditing) return;
+        setIsDragging(false);
+        setSelectionBox(null);
+        setFinalSelectedCells(new Set(hoverSelectedCells));
+    };
+
+    // 监听重置逻辑
     useEffect(() => {
-      if (resetSelection) {
-          setLocalLeftSelected(null);
-          setLocalRightSelected(null);
-          setLeftSelected(null);
-          setRightSelected(null);
-      }
-    }, [resetSelection]); 
+        if (resetSelection) {
+            setHoverSelectedCells(new Set());
+            setFinalSelectedCells(new Set());
+            setSelectionBox(null);
+            setStartPoint(null);
+        }
+    }, [resetSelection]);
 
     return (
         <div
+            ref={gridRef}
             className={styles.gridContainer}
-            style={{
-                zIndex: isEditing ? 9999 : 999, // 默认 999，编辑时 9999
-                height: '100%',
-            }}
+            style={{ zIndex: isEditing ? 9999 : 999, height: '100%' }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
         >
-            {/* 清空按钮，供 "保存编辑" 时调用 */}
-            <button
-                style={{ display: 'none' }} // 这个按钮不会展示，但会被 `Dashboard.tsx` 触发
-                onClick={() => {
-                    setLocalLeftSelected(null);
-                    setLocalRightSelected(null);
-                    setLeftSelected(null);
-                    setRightSelected(null);
-                }}
-            >
-                Reset
-            </button>
+            {/* 框选区域（仅在 `isEditing` 开启时可见） */}
+            {isEditing && selectionBox && (
+                <div
+                    className={styles.selectionBox}
+                    style={{
+                        left: selectionBox.left,
+                        top: selectionBox.top,
+                        width: selectionBox.width,
+                        height: selectionBox.height,
+                    }}
+                />
+            )}
 
+            {/* 网格按钮 */}
             {Array.from({ length: ROWS }).map((_, i) => (
                 <div key={i} className={styles.gridRow}>
                     {Array.from({ length: COLS }).map((_, j) => {
-                        const isLeftActive = leftSelected && leftSelected.row === i && leftSelected.col === j;
-                        const isRightActive = rightSelected && rightSelected.row === i && rightSelected.col === j;
-                        const isBothActive = isLeftActive && isRightActive;
-
+                        const isHovered = isEditing && hoverSelectedCells.has(`${i}-${j}`);
+                        const isFinalSelected = isEditing && finalSelectedCells.has(`${i}-${j}`);
                         return (
                             <button
                                 key={j}
-                                className={`${styles.gridCell} 
-                                    ${isBothActive ? styles.activeBoth : ''} 
-                                    ${!isBothActive && isLeftActive ? styles.activeLeft : ''} 
-                                    ${!isBothActive && isRightActive ? styles.activeRight : ''}`}
-                                onClick={() => handleCellClick(i, j, false)}
-                                onContextMenu={(e) => {
-                                    e.preventDefault();
-                                    handleCellClick(i, j, true);
-                                }}
+                                className={`${styles.gridCell} ${!isEditing ? styles.disabled : ''} 
+                                    ${isHovered ? styles.hoverActive : ''} 
+                                    ${isFinalSelected ? styles.finalActive : ''}`}
                             >
                                 {i},{j}
                             </button>
