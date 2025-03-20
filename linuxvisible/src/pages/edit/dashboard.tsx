@@ -92,6 +92,10 @@ const Dashboard: React.FC = () => {
 
     // 处理修改特性
     const handleConfirmFeature = () => {
+        if (isAddingFeature) {
+            message.warning('请退出添加特性状态');
+            return;
+        }
         if (!featureName) {
             message.warning('请选择一个特性');
             return;
@@ -114,6 +118,10 @@ const Dashboard: React.FC = () => {
 
     // 处理添加特性
     const handleConfirmNewFeature = () => {
+        if (isEditing) {
+            message.warning('请退出修改特性状态');
+            return;
+        }
         if (!newFeatureName) {
             message.warning('请输入新的特性名称');
             return;
