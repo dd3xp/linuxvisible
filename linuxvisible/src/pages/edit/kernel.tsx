@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { addPosToList, calculateKernelContainerPos } from '../../utils/calculateContainerPos';
-import { getLevel3Color, getUniqueContainers } from '../../utils/common';
+import { getLevel3Color } from '../../utils/common';
 import { Empty } from 'antd';
 import { EntityNode } from '../../utils/API';
 
@@ -11,33 +11,21 @@ interface VersionInformation {
 
 interface KernelProps {
     versionInfo: VersionInformation | null;
+    entities: EntityNode[];
     setFeatureName: (name: string) => void;
     selectedKernel: number | null;
     setSelectedKernel: (id: number | null) => void;
 }
 
-const Kernel: React.FC<KernelProps> = ({ versionInfo, setFeatureName, selectedKernel, setSelectedKernel }) => {
+const Kernel: React.FC<KernelProps> = ({ versionInfo, entities, setFeatureName, selectedKernel, setSelectedKernel }) => {
     const [containerData, setContainerData] = useState<EntityNode[]>([]);
     const [staticRender, setStaticRender] = useState<JSX.Element | null>(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (!versionInfo?.repo || !versionInfo?.version) return;
-
-            try {
-                // console.log("🔹 获取数据中...");
-                const fetchedData = await getUniqueContainers(versionInfo.repo, versionInfo.version, versionInfo.version);
-                // console.log("📄 获取的 JSON 数据:", fetchedData);
-
-                let jsonDataVariable = fetchedData;
-                // console.log("🔍 变量存储的 JSON:", jsonDataVariable);
-                setContainerData(jsonDataVariable);
-            } catch (error) {
-                // console.error("❌ 处理 JSON 失败:", error);
-            }
-        };
-        fetchData();
-    }, [versionInfo]);    
+        if (entities.length > 0) {
+            setContainerData(entities);
+        }
+    }, [entities]);
 
     useEffect(() => {
         addPosToList(containerData);
@@ -94,7 +82,7 @@ const Kernel: React.FC<KernelProps> = ({ versionInfo, setFeatureName, selectedKe
                                 setSelectedKernel(eid);
                                 setFeatureName(nameEn);
                             }
-                        }}
+                        }}                        
                     >
                         <div className={`level-${level}-title ${belong_to_name}-title`}>
                             {nameEn}

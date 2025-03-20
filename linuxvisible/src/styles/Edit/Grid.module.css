@@ -60,3 +60,8 @@
   cursor: not-allowed !important;
   pointer-events: none !important; /* 彻底禁用 hover、点击 */
 }
+
+.unavailableActive {
+  background-color: rgba(255, 99, 71, 0.6) !important; /* 红色标记无效格子 */
+  border-color: red !important;
+}

@@ -5,9 +5,10 @@ import { gridSize, linuxSize } from '../../utils/calculateContainerPos';
 interface GridProps {
     isEditing: boolean;
     resetSelection: boolean;
+    unavailableGrids: number[][]; // 接收不可用格子数据
 }
 
-const Grid: React.FC<GridProps> = ({ isEditing, resetSelection }) => {
+const Grid: React.FC<GridProps> = ({ isEditing, resetSelection, unavailableGrids }) => {
     const WIDTH = linuxSize[0];
     const HEIGHT = linuxSize[1];
     const GRID = gridSize;
@@ -24,6 +25,8 @@ const Grid: React.FC<GridProps> = ({ isEditing, resetSelection }) => {
     const [hoverSelectedCells, setHoverSelectedCells] = useState<Set<string>>(new Set());
     // 记录鼠标松开时最终选中的按钮
     const [finalSelectedCells, setFinalSelectedCells] = useState<Set<string>>(new Set());
+    // 记录是否框选了不可用的格子
+    const [hasInvalidSelection, setHasInvalidSelection] = useState<boolean>(false);
 
     // 获取鼠标相对 Grid 容器的位置
     const getRelativePosition = (event: MouseEvent) => {
@@ -80,15 +83,23 @@ const Grid: React.FC<GridProps> = ({ isEditing, resetSelection }) => {
 
         // 计算当前框选到的按钮
         const newHoverSelectedCells = new Set<string>();
+        let hasInvalid = false;
+
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
                 const cell = getCellBounds(r, c);
                 if (isCellIntersecting(cell, newSelectionBox)) {
                     newHoverSelectedCells.add(`${r}-${c}`);
+                    // 检查是否是无效格子
+                    if (unavailableGrids.some(([ur, uc]) => ur === r && uc === c)) {
+                        hasInvalid = true;
+                    }
                 }
             }
         }
+
         setHoverSelectedCells(newHoverSelectedCells);
+        setHasInvalidSelection(hasInvalid);
     };
 
     // 鼠标释放 -> 记录最终选中的按钮
@@ -97,6 +108,18 @@ const Grid: React.FC<GridProps> = ({ isEditing, resetSelection }) => {
         setIsDragging(false);
         setSelectionBox(null);
         setFinalSelectedCells(new Set(hoverSelectedCells));
+
+        // 对比框选的格子和不可用格子
+        const invalidCells = Array.from(hoverSelectedCells).filter((cell) => {
+            const [row, col] = cell.split('-').map(Number);
+            return unavailableGrids.some(([ur, uc]) => ur === row && uc === col);
+        });
+
+        if (invalidCells.length > 0) {
+            console.log('Invalid cells selected:', invalidCells);
+        } else {
+            console.log('All selected cells are valid.');
+        }
     };
 
     // 监听重置逻辑
@@ -137,12 +160,16 @@ const Grid: React.FC<GridProps> = ({ isEditing, resetSelection }) => {
                     {Array.from({ length: COLS }).map((_, j) => {
                         const isHovered = isEditing && hoverSelectedCells.has(`${i}-${j}`);
                         const isFinalSelected = isEditing && finalSelectedCells.has(`${i}-${j}`);
+                        const isUnavailable = unavailableGrids.some(([ur, uc]) => ur === i && uc === j);
+
                         return (
                             <button
                                 key={j}
                                 className={`${styles.gridCell} ${!isEditing ? styles.disabled : ''} 
                                     ${isHovered ? styles.hoverActive : ''} 
-                                    ${isFinalSelected ? styles.finalActive : ''}`}
+                                    ${isFinalSelected ? styles.finalActive : ''} 
+                                    ${isUnavailable ? styles.unavailableActive : ''}`}
+                                style={isUnavailable ? { backgroundColor: 'rgba(255, 99, 71, 0.6)', borderColor: 'red' } : {}}
                             >
                                 {i},{j}
                             </button>
