@@ -268,6 +268,9 @@ const Dashboard: React.FC = () => {
         setEditingDisplayName('');
         setEditingDisplayNameCn('');
         setSelectedPosition(null);
+        setHaveUnavailableGrids(false);
+        setDifferentParents(false);
+        setSelectedPosition(null);
         setTimeout(() => setResetTrigger(true), 0);
     };
 
@@ -314,6 +317,8 @@ const Dashboard: React.FC = () => {
             setSavedEditingParentEid(parentEntry ? Number(parentEntry[0]) : null);
         }
     
+        setHaveUnavailableGrids(false); // 清除非法区域状态
+        setDifferentParents(false); // 清除不同父容器状态
         handleCancelEditingiting();
     };    
 
