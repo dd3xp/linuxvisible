@@ -134,47 +134,66 @@ const Dashboard: React.FC = () => {
     };
 
     const handlePanelChange = (keys: string[] | string) => {
-        const clickedKey = typeof keys === 'string' ? keys : keys[keys.length - 1];
-        let nextActiveKeys: string[] = [];
+        let keyArray = typeof keys === 'string' ? [keys] : [...keys];
     
-        if (clickedKey === 'feature-add') {
-            // 打开修改特性面板，关闭添加特性
-            setIsAddingFeature(false);
-            if (featureName) {
-                const entity = entities.find(e => e.nameEn === featureName);
-                if (entity) {
-                    setIsEditing(true);
-                    setEditingEid(entity.eid);
-                    setEditingDisplayName(entity.nameEn);
-                    setCurrentMode('editing');
+        // 检查是否同时展开了 feature-add 和 feature-create
+        const hasAdd = keyArray.includes('feature-add');
+        const hasCreate = keyArray.includes('feature-create');
+    
+        // 如果同时展开，优先保留当前点击的那个，关闭另一个
+        if (hasAdd && hasCreate) {
+            // 最后点的是哪个就保留哪个，移除另一个
+            const lastClicked = keyArray[keyArray.length - 1];
+            if (lastClicked === 'feature-add') {
+                keyArray = keyArray.filter(k => k !== 'feature-create');
+                setIsAddingFeature(false);
+                if (featureName) {
+                    const entity = entities.find(e => e.nameEn === featureName);
+                    if (entity) {
+                        setIsEditing(true);
+                        setEditingEid(entity.eid);
+                        setEditingDisplayName(entity.nameEn);
+                        setCurrentMode('editing');
+                    }
                 } else {
                     setIsEditing(false);
                     setCurrentMode(null);
                 }
+            } else if (lastClicked === 'feature-create') {
+                keyArray = keyArray.filter(k => k !== 'feature-add');
+                setIsEditing(false);
+                setIsAddingFeature(true);
+                setCurrentMode('adding');
+            }
+        } else {
+            // 如果只展开了一个，照常处理模式切换
+            if (hasAdd) {
+                setIsAddingFeature(false);
+                if (featureName) {
+                    const entity = entities.find(e => e.nameEn === featureName);
+                    if (entity) {
+                        setIsEditing(true);
+                        setEditingEid(entity.eid);
+                        setEditingDisplayName(entity.nameEn);
+                        setCurrentMode('editing');
+                    }
+                } else {
+                    setIsEditing(false);
+                    setCurrentMode(null);
+                }
+            } else if (hasCreate) {
+                setIsEditing(false);
+                setIsAddingFeature(true);
+                setCurrentMode('adding');
             } else {
                 setIsEditing(false);
+                setIsAddingFeature(false);
                 setCurrentMode(null);
             }
-            nextActiveKeys = ['feature-add'];
-    
-        } else if (clickedKey === 'feature-create') {
-            // 打开添加特性面板，关闭修改特性
-            setIsEditing(false);
-            setIsAddingFeature(true);
-            setCurrentMode('adding');
-            nextActiveKeys = ['feature-create'];
-    
-        } else {
-            // 折叠全部
-            setIsEditing(false);
-            setIsAddingFeature(false);
-            setCurrentMode(null);
-            nextActiveKeys = [];
         }
     
-        // 最后设置 active keys（放在最后确保状态更新同步）
-        setActivePanelKey(nextActiveKeys);
-    };    
+        setActivePanelKey(keyArray);
+    };
 
     const handleCancelEditingiting = () => {
         setIsEditing(false);
