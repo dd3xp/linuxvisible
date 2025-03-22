@@ -32,12 +32,12 @@ export const calculateUnavailableGrids = (entities: EntityNode[]): number[][] =>
     return unavailableGrids;
 };
 
-// 计算 level 2 容器的格子
-export const calculateLevel2ContainerGrids = (entities: EntityNode[]): Record<number, number[][]> => {
-    const level2ContainerGrids: Record<number, number[][]> = {};
+// 计算某一层级的容器格子（level 1 或 2）
+export const calculateParentsGrids = (entities: EntityNode[], level: number): Record<number, number[][]> => {
+    const containerGrids: Record<number, number[][]> = {};
 
     entities
-        .filter(entity => entity.level === 2)
+        .filter(entity => entity.level === level)
         .forEach(({ eid, x1, y1, x2, y2 }) => {
             const minX = Math.min(x1, x2);
             const maxX = Math.max(x1, x2);
@@ -56,10 +56,10 @@ export const calculateLevel2ContainerGrids = (entities: EntityNode[]): Record<nu
                 }
             }
 
-            level2ContainerGrids[eid] = grids;
+            containerGrids[eid] = grids;
         });
 
-    return level2ContainerGrids;
+    return containerGrids;
 };
 
 // 计算添加特征时不可用的格子
@@ -82,4 +82,42 @@ export const calculateEditFeatureUnavailableGrids = (
     return originalUnavailableGrids.filter(
         ([row, col]) => !editingFeatureGrids.some(([er, ec]) => er === row && ec === col)
     );
+};
+
+export const findStrictContainerName = (
+    entities: EntityNode[],
+    level2Grids: Record<number, number[][]>,
+    level1Grids: Record<number, number[][]>,
+    x1: number, y1: number, x2: number, y2: number
+): string | null => {
+    // 尝试是否同属某一个 level 2 容器
+    for (const [eidStr, grids] of Object.entries(level2Grids)) {
+        const eid = Number(eidStr);
+        const hasStart = grids.some(([r, c]) => r === x1 && c === y1);
+        const hasEnd = grids.some(([r, c]) => r === x2 && c === y2);
+        if (hasStart && hasEnd) {
+            const found = entities.find(e => e.eid === eid);
+            return found?.nameEn ?? null;
+        }
+    }
+
+    // 判断是否两个点都不在任何 level 2 容器中
+    const isStartInLevel2 = Object.values(level2Grids).some(grids => grids.some(([r, c]) => r === x1 && c === y1));
+    const isEndInLevel2 = Object.values(level2Grids).some(grids => grids.some(([r, c]) => r === x2 && c === y2));
+
+    // 只有当两个点都不在任何 level 2 容器中时，才会继续判断 level 1 容器
+    if (!isStartInLevel2 && !isEndInLevel2) {
+        // 尝试 fallback 到 level 1
+        for (const [eidStr, grids] of Object.entries(level1Grids)) {
+            const eid = Number(eidStr);
+            const hasStart = grids.some(([r, c]) => r === x1 && c === y1);
+            const hasEnd = grids.some(([r, c]) => r === x2 && c === y2);
+            if (hasStart && hasEnd) {
+                const found = entities.find(e => e.eid === eid);
+                return found?.nameEn ?? null;
+            }
+        }
+    }
+
+    return null;
 };

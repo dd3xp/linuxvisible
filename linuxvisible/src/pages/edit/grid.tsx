@@ -12,6 +12,8 @@ interface GridProps {
     setDifferentParents: (value: boolean) => void; // 用于根据是否有不同父级来控制是否可以保存
     setSelectedPosition: (value: string | null) => void; // 用于保存编辑后的实体位置
     setNewFeaturePosition: (pos: string) => void; // 用于保存新特性的位置
+    setEditingParentContainerName: (name: string) => void; // 用于保存编辑的父级容器名
+    setNewFeatureParentContainerName: (name: string) => void; // 用于保存新特性的父级容器名
 }
 
 const Grid: React.FC<GridProps> = ({ 
@@ -23,7 +25,9 @@ const Grid: React.FC<GridProps> = ({
     setHaveUnavailableGrids, 
     setDifferentParents, 
     setSelectedPosition,
-    setNewFeaturePosition }) => {
+    setNewFeaturePosition,
+    setEditingParentContainerName,
+    setNewFeatureParentContainerName }) => {
 
     const WIDTH = linuxSize[0];
     const HEIGHT = linuxSize[1];
@@ -120,75 +124,74 @@ const Grid: React.FC<GridProps> = ({
 
     // 鼠标释放 -> 记录最终选中的按钮
     const handleMouseUp = () => {
-        if (!isEditing) return;
+        if (!isEditing && !isAdding) return;
         setIsDragging(false);
         setSelectionBox(null);
         setFinalSelectedCells(new Set(hoverSelectedCells));
 
         if (hoverSelectedCells.size > 0) {
             const coords = Array.from(hoverSelectedCells).map(cell => {
-              const [r, c] = cell.split('-').map(Number);
-              return { row: r, col: c };
+            const [r, c] = cell.split('-').map(Number);
+            return { row: r, col: c };
             });
-          
+        
             const rows = coords.map(coord => coord.row);
             const cols = coords.map(coord => coord.col);
             const minRow = Math.min(...rows);
             const maxRow = Math.max(...rows);
             const minCol = Math.min(...cols);
             const maxCol = Math.max(...cols);
-          
+        
             if (isAdding) {
-              setNewFeaturePosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
+            setNewFeaturePosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
             }
-          
+        
             if (isEditing) {
-              setSelectedPosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
+            setSelectedPosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
             }
-          } else {
-            if (isAdding) {
-              setNewFeaturePosition('');
-            }
-            if (isEditing) {
-              setSelectedPosition(null); // 恢复原始位置
-            }
-          }
-          
 
-        if (hoverSelectedCells.size === 0) {
-            console.log('No grids selected.');
-            setFinalSelectedCells(new Set());
-            setHaveUnavailableGrids(false);
-            return;
-        }
-
-        // 检查是否有不同的父级
-        const parentSet = new Set<number>();
-        const findParent = (row: number, col: number): number | null => {
-            for (const [eid, gridList] of Object.entries(level2ContainerGrids)) {
-                if (gridList.some(([r, c]) => r === row && c === col)) {
-                    return Number(eid);
+            // 检查是否有不同的父级
+            const parentSet = new Set<number>();
+            const findParent = (row: number, col: number): number | null => {
+                for (const [eid, gridList] of Object.entries(level2ContainerGrids)) {
+                    if (gridList.some(([r, c]) => r === row && c === col)) {
+                        return Number(eid);
+                    }
                 }
+                return null;
+            };
+        
+            hoverSelectedCells.forEach((cellStr) => {
+                const [row, col] = cellStr.split('-').map(Number);
+                const parent = findParent(row, col);
+                if (parent !== null) {
+                    parentSet.add(parent);
+                }
+            });
+        
+            if (parentSet.size === 1) {
+                const parentId = Array.from(parentSet)[0];
+                const parentEntity = Object.entries(level2ContainerGrids).find(([eid]) => Number(eid) === parentId);
+                const parentName = parentEntity ? `容器 ${parentId}` : '无效的父容器';
+            
+                if (isEditing) setEditingParentContainerName(parentName);
+                if (isAdding) setNewFeatureParentContainerName(parentName);
+            
+                setDifferentParents(false);
+            } else {
+                if (isEditing) setEditingParentContainerName('无效的父容器');
+                if (isAdding) setNewFeatureParentContainerName('无效的父容器');
+            
+                setDifferentParents(true);
             }
-            return null;
-        };
-    
-        hoverSelectedCells.forEach((cellStr) => {
-            const [row, col] = cellStr.split('-').map(Number);
-            const parent = findParent(row, col);
-            if (parent !== null) {
-                parentSet.add(parent);
-            }
-        });
-    
-        if (parentSet.size > 1) {
-            console.error('different parents selected:', parentSet);
-            setDifferentParents(true);
         } else {
-            setDifferentParents(false);
+            if (isAdding) {
+            setNewFeaturePosition('');
+            }
+            if (isEditing) {
+            setSelectedPosition(null); // 恢复原始位置
+            }
         }
-
-        setFinalSelectedCells(new Set(hoverSelectedCells));
 
         // 对比框选的格子和不可用格子
         const invalidCells = Array.from(hoverSelectedCells).filter((cell) => {
@@ -225,7 +228,8 @@ const Grid: React.FC<GridProps> = ({
             onMouseUp={handleMouseUp}
         >
             {(isEditing || isAdding) && selectionBox && (
-                    <div className={styles.selectionBox}
+                <div
+                    className={styles.selectionBox}
                     style={{
                         left: selectionBox.left,
                         top: selectionBox.top,
@@ -247,7 +251,7 @@ const Grid: React.FC<GridProps> = ({
                         return (
                             <button
                                 key={j}
-                                className={`${styles.gridCell} ${!(isEditing || isAdding) ? styles.disabled : ''}
+                                className={`${styles.gridCell} ${!isActive ? styles.disabled : ''}
                                     ${isHovered ? styles.hoverActive : ''} 
                                     ${isFinalSelected ? styles.finalActive : ''} 
                                     ${isUnavailable ? styles.unavailableActive : ''}`}
