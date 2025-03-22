@@ -206,7 +206,7 @@ const Dashboard: React.FC = () => {
     };
 
     const handleCancelNewFeature = () => {
-        setIsAddingFeature(false);
+        // setIsAddingFeature(false);
         setNewFeatureName('');
         setResetTrigger(false);
         setTimeout(() => setResetTrigger(true), 0);

@@ -71,7 +71,7 @@ const Kernel: React.FC<KernelProps> = ({ versionInfo, entities, setFeatureName, 
                             bottom: position[1],
                             left: position[2],
                             right: position[3],
-                            backgroundColor: selectedKernel === eid ? 'red' : level3_color,
+                            backgroundColor: level3_color,
                             cursor: 'pointer'
                         }}
                         onClick={() => {
