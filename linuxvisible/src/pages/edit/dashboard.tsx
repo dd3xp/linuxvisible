@@ -58,7 +58,11 @@ const Dashboard: React.FC = () => {
     // 修改的内容
     const [editingEid, setEditingEid] = useState<number | null>(null);
     const [editingDisplayName, setEditingDisplayName] = useState('');
+    const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
 
+    // 新增的内容
+    const [newFeatureEid, setNewFeatureEid] = useState<number | null>(null);
+    const [newFeaturePosition, setNewFeaturePosition] = useState<string>('');
 
     useEffect(() => {
         getVersion().then((data) => {
@@ -212,6 +216,15 @@ const Dashboard: React.FC = () => {
         setTimeout(() => setResetTrigger(true), 0);
     };
 
+    const editingEntitiesPosition = useMemo(() => {
+        const entity = featureName ? entities.find(e => e.nameEn === featureName) ?? null : null;
+        if (!entity) return '';
+        const { x1, y1, x2, y2 } = entity;
+        return `(${x1}, ${y1}) - (${x2}, ${y2})`;
+    }, [entities, featureName]);      
+    
+    const displayPosition = selectedPosition ?? editingEntitiesPosition;
+
     return (
         <div className={styles.dashboardContainer}>
             <div className={styles.sidebar}>
@@ -283,7 +296,9 @@ const Dashboard: React.FC = () => {
                                         onChange={e => setEditingDisplayName(e.target.value)} 
                                     />
                                     </Form.Item>
-                                    
+                                    <Form.Item label="位置">
+                                        <div>{displayPosition || '无'}</div>
+                                    </Form.Item>
                                     <Button type="default" onClick={handleCancelEditingiting} style={{ marginRight: 10 }}>取消</Button>
                                     </>
                                 </Form>
@@ -294,16 +309,35 @@ const Dashboard: React.FC = () => {
                         key: 'feature-create',
                         label: '添加特性',
                         children: (
-                            <div className={styles.featurePanel}>
-                                <Form layout="vertical">
-                                    <Form.Item label="特性名称">
-                                        <Input placeholder="输入新的特性名称" value={newFeatureName} onChange={(e) => setNewFeatureName(e.target.value)} />
-                                    </Form.Item>
-                                    <Button type="default" onClick={handleCancelNewFeature} style={{ marginRight: 10 }}>取消</Button>
-                                </Form>
-                            </div>
+                          <div className={styles.featurePanel}>
+                            <Form layout="vertical">
+                              <Form.Item label="eid">
+                                <Input
+                                  placeholder="请输入 eid"
+                                  value={newFeatureEid ?? ''}
+                                  onChange={(e) => setNewFeatureEid(Number(e.target.value))}
+                                />
+                              </Form.Item>
+                      
+                              <Form.Item label="显示名称">
+                                <Input
+                                  placeholder="输入新的特性名称"
+                                  value={newFeatureName}
+                                  onChange={(e) => setNewFeatureName(e.target.value)}
+                                />
+                              </Form.Item>
+                      
+                              <Form.Item label="位置">
+                                <div>{newFeaturePosition || '暂无'}</div>
+                              </Form.Item>
+                      
+                              <Button type="default" onClick={handleCancelNewFeature} style={{ marginRight: 10 }}>
+                                取消
+                              </Button>
+                            </Form>
+                          </div>
                         ),
-                    }
+                      }                      
                 ]}
                     expandIconPosition="end"
                     bordered={false}
@@ -317,12 +351,15 @@ const Dashboard: React.FC = () => {
                     {showContent ? (
                         <>
                             <Grid 
-                            isEditing={isEditing || isAddingFeature} 
+                            isAddingFeature={isAddingFeature}
+                            isEditing={isEditing} 
                             resetSelection={resetTrigger} 
                             unavailableGrids={unavailableGrids} 
                             setHaveUnavailableGrids={setHaveUnavailableGrids}
                             setDifferentParents={setDifferentParents}
                             level2ContainerGrids={level2ContainerGrids}
+                            setSelectedPosition={setSelectedPosition}
+                            setNewFeaturePosition={setNewFeaturePosition}
                             />
                             <Kernel 
                             versionInfo={versionInfo} 

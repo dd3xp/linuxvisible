@@ -4,20 +4,26 @@ import { gridSize, linuxSize } from '../../utils/calculateContainerPos';
 
 interface GridProps {
     isEditing: boolean;
+    isAddingFeature: boolean;
     resetSelection: boolean;
     unavailableGrids: number[][]; // 接收不可用格子数据
     level2ContainerGrids: Record<number, number[][]>; // 接收 level 2 容器的格子数据
     setHaveUnavailableGrids: (value: boolean) => void; // 用于根据是否有不可用格子来控制是否可以保存
     setDifferentParents: (value: boolean) => void; // 用于根据是否有不同父级来控制是否可以保存
+    setSelectedPosition: (value: string | null) => void; // 用于保存编辑后的实体位置
+    setNewFeaturePosition: (pos: string) => void; // 用于保存新特性的位置
 }
 
 const Grid: React.FC<GridProps> = ({ 
     isEditing, 
+    isAddingFeature,
     resetSelection, 
     unavailableGrids, 
     level2ContainerGrids, 
     setHaveUnavailableGrids, 
-    setDifferentParents }) => {
+    setDifferentParents, 
+    setSelectedPosition,
+    setNewFeaturePosition }) => {
 
     const WIDTH = linuxSize[0];
     const HEIGHT = linuxSize[1];
@@ -70,7 +76,7 @@ const Grid: React.FC<GridProps> = ({
 
     // 鼠标按下 -> 开始框选（仅在 `isEditing === true` 时生效）
     const handleMouseDown = (event: React.MouseEvent) => {
-        if (!isEditing) return; 
+        if (!isEditing && !isAddingFeature) return;
         const { x, y } = getRelativePosition(event.nativeEvent);
         setStartPoint({ x, y });
         setIsDragging(true);
@@ -80,7 +86,7 @@ const Grid: React.FC<GridProps> = ({
 
     // 鼠标移动 -> 更新选框和"框选中的按钮"
     const handleMouseMove = (event: React.MouseEvent) => {
-        if (!isDragging || !startPoint || !isEditing) return;
+        if (!isDragging || !startPoint || (!isEditing && !isAddingFeature)) return;
 
         const { x, y } = getRelativePosition(event.nativeEvent);
         const newSelectionBox = {
@@ -118,6 +124,36 @@ const Grid: React.FC<GridProps> = ({
         setIsDragging(false);
         setSelectionBox(null);
         setFinalSelectedCells(new Set(hoverSelectedCells));
+
+        if (hoverSelectedCells.size > 0) {
+            const coords = Array.from(hoverSelectedCells).map(cell => {
+              const [r, c] = cell.split('-').map(Number);
+              return { row: r, col: c };
+            });
+          
+            const rows = coords.map(coord => coord.row);
+            const cols = coords.map(coord => coord.col);
+            const minRow = Math.min(...rows);
+            const maxRow = Math.max(...rows);
+            const minCol = Math.min(...cols);
+            const maxCol = Math.max(...cols);
+          
+            if (isAddingFeature) {
+              setNewFeaturePosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
+            }
+          
+            if (isEditing) {
+              setSelectedPosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
+            }
+          } else {
+            if (isAddingFeature) {
+              setNewFeaturePosition('');
+            }
+            if (isEditing) {
+              setSelectedPosition(null); // 恢复原始位置
+            }
+          }
+          
 
         if (hoverSelectedCells.size === 0) {
             console.log('No grids selected.');
@@ -183,15 +219,13 @@ const Grid: React.FC<GridProps> = ({
         <div
             ref={gridRef}
             className={styles.gridContainer}
-            style={{ zIndex: isEditing ? 9999 : 999, height: '100%' }}
+            style={{ zIndex: (isEditing || isAddingFeature) ? 9999 : 999, height: '100%' }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
-            {/* 框选区域（仅在 `isEditing` 开启时可见） */}
-            {isEditing && selectionBox && (
-                <div
-                    className={styles.selectionBox}
+            {(isEditing || isAddingFeature) && selectionBox && (
+                    <div className={styles.selectionBox}
                     style={{
                         left: selectionBox.left,
                         top: selectionBox.top,
@@ -205,14 +239,15 @@ const Grid: React.FC<GridProps> = ({
             {Array.from({ length: ROWS }).map((_, i) => (
                 <div key={i} className={styles.gridRow}>
                     {Array.from({ length: COLS }).map((_, j) => {
-                        const isHovered = isEditing && hoverSelectedCells.has(`${i}-${j}`);
-                        const isFinalSelected = isEditing && finalSelectedCells.has(`${i}-${j}`);
+                        const isActive = isEditing || isAddingFeature;
+                        const isHovered = isActive && hoverSelectedCells.has(`${i}-${j}`);
+                        const isFinalSelected = isActive && finalSelectedCells.has(`${i}-${j}`);                        
                         const isUnavailable = unavailableGrids.some(([ur, uc]) => ur === i && uc === j);
 
                         return (
                             <button
                                 key={j}
-                                className={`${styles.gridCell} ${!isEditing ? styles.disabled : ''} 
+                                className={`${styles.gridCell} ${!(isEditing || isAddingFeature) ? styles.disabled : ''}
                                     ${isHovered ? styles.hoverActive : ''} 
                                     ${isFinalSelected ? styles.finalActive : ''} 
                                     ${isUnavailable ? styles.unavailableActive : ''}`}
