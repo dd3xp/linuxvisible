@@ -4,7 +4,7 @@ import { gridSize, linuxSize } from '../../utils/calculateContainerPos';
 
 interface GridProps {
     isEditing: boolean;
-    isAddingFeature: boolean;
+    isAdding: boolean;
     resetSelection: boolean;
     unavailableGrids: number[][]; // 接收不可用格子数据
     level2ContainerGrids: Record<number, number[][]>; // 接收 level 2 容器的格子数据
@@ -16,7 +16,7 @@ interface GridProps {
 
 const Grid: React.FC<GridProps> = ({ 
     isEditing, 
-    isAddingFeature,
+    isAdding,
     resetSelection, 
     unavailableGrids, 
     level2ContainerGrids, 
@@ -76,7 +76,7 @@ const Grid: React.FC<GridProps> = ({
 
     // 鼠标按下 -> 开始框选（仅在 `isEditing === true` 时生效）
     const handleMouseDown = (event: React.MouseEvent) => {
-        if (!isEditing && !isAddingFeature) return;
+        if (!isEditing && !isAdding) return;
         const { x, y } = getRelativePosition(event.nativeEvent);
         setStartPoint({ x, y });
         setIsDragging(true);
@@ -86,7 +86,7 @@ const Grid: React.FC<GridProps> = ({
 
     // 鼠标移动 -> 更新选框和"框选中的按钮"
     const handleMouseMove = (event: React.MouseEvent) => {
-        if (!isDragging || !startPoint || (!isEditing && !isAddingFeature)) return;
+        if (!isDragging || !startPoint || (!isEditing && !isAdding)) return;
 
         const { x, y } = getRelativePosition(event.nativeEvent);
         const newSelectionBox = {
@@ -138,7 +138,7 @@ const Grid: React.FC<GridProps> = ({
             const minCol = Math.min(...cols);
             const maxCol = Math.max(...cols);
           
-            if (isAddingFeature) {
+            if (isAdding) {
               setNewFeaturePosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
             }
           
@@ -146,7 +146,7 @@ const Grid: React.FC<GridProps> = ({
               setSelectedPosition(`(${minRow}, ${minCol}) - (${maxRow}, ${maxCol})`);
             }
           } else {
-            if (isAddingFeature) {
+            if (isAdding) {
               setNewFeaturePosition('');
             }
             if (isEditing) {
@@ -219,12 +219,12 @@ const Grid: React.FC<GridProps> = ({
         <div
             ref={gridRef}
             className={styles.gridContainer}
-            style={{ zIndex: (isEditing || isAddingFeature) ? 9999 : 999, height: '100%' }}
+            style={{ zIndex: (isEditing || isAdding) ? 9999 : 999, height: '100%' }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
-            {(isEditing || isAddingFeature) && selectionBox && (
+            {(isEditing || isAdding) && selectionBox && (
                     <div className={styles.selectionBox}
                     style={{
                         left: selectionBox.left,
@@ -239,7 +239,7 @@ const Grid: React.FC<GridProps> = ({
             {Array.from({ length: ROWS }).map((_, i) => (
                 <div key={i} className={styles.gridRow}>
                     {Array.from({ length: COLS }).map((_, j) => {
-                        const isActive = isEditing || isAddingFeature;
+                        const isActive = isEditing || isAdding;
                         const isHovered = isActive && hoverSelectedCells.has(`${i}-${j}`);
                         const isFinalSelected = isActive && finalSelectedCells.has(`${i}-${j}`);                        
                         const isUnavailable = unavailableGrids.some(([ur, uc]) => ur === i && uc === j);
@@ -247,7 +247,7 @@ const Grid: React.FC<GridProps> = ({
                         return (
                             <button
                                 key={j}
-                                className={`${styles.gridCell} ${!(isEditing || isAddingFeature) ? styles.disabled : ''}
+                                className={`${styles.gridCell} ${!(isEditing || isAdding) ? styles.disabled : ''}
                                     ${isHovered ? styles.hoverActive : ''} 
                                     ${isFinalSelected ? styles.finalActive : ''} 
                                     ${isUnavailable ? styles.unavailableActive : ''}`}

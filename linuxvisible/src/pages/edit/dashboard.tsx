@@ -37,7 +37,7 @@ const Dashboard: React.FC = () => {
 
     // 新增的添加特性状态
     const [newFeatureName, setNewFeatureName] = useState<string>('');
-    const [isAddingFeature, setIsAddingFeature] = useState(false);
+    const [isAdding, setisAdding] = useState(false);
 
     // 选择的内核
     const [selectedKernel, setSelectedKernel] = useState<number | null>(null);
@@ -83,7 +83,7 @@ const Dashboard: React.FC = () => {
 
     useEffect(() => {
         console.log('Entities:', entities);
-        if (isAddingFeature) {
+        if (isAdding) {
             const grids = calculateAddFeatureUnavailableGrids(entities);
             console.log('Calculated unavailable grids for adding feature:', grids);
             setUnavailableGrids(grids);
@@ -96,7 +96,7 @@ const Dashboard: React.FC = () => {
                 setUnavailableGrids(grids);
             }
         }
-    }, [isAddingFeature, isEditing, entities, featureName]);
+    }, [isAdding, isEditing, entities, featureName]);
 
     const handleRepoChange = (repo: string) => {
         setVersionInfo({ repo, version: null });
@@ -132,7 +132,7 @@ const Dashboard: React.FC = () => {
           setIsEditing(true);
           setEditingEid(entity.eid);
           setEditingDisplayName(entity.nameEn);
-          setIsAddingFeature(false);
+          setisAdding(false);
           setCurrentMode('editing');
         }
     };
@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
             const lastClicked = keyArray[keyArray.length - 1];
             if (lastClicked === 'feature-add') {
                 keyArray = keyArray.filter(k => k !== 'feature-create');
-                setIsAddingFeature(false);
+                setisAdding(false);
                 if (featureName) {
                     const entity = entities.find(e => e.nameEn === featureName);
                     if (entity) {
@@ -166,13 +166,13 @@ const Dashboard: React.FC = () => {
             } else if (lastClicked === 'feature-create') {
                 keyArray = keyArray.filter(k => k !== 'feature-add');
                 setIsEditing(false);
-                setIsAddingFeature(true);
+                setisAdding(true);
                 setCurrentMode('adding');
             }
         } else {
             // 如果只展开了一个，照常处理模式切换
             if (hasAdd) {
-                setIsAddingFeature(false);
+                setisAdding(false);
                 if (featureName) {
                     const entity = entities.find(e => e.nameEn === featureName);
                     if (entity) {
@@ -187,11 +187,11 @@ const Dashboard: React.FC = () => {
                 }
             } else if (hasCreate) {
                 setIsEditing(false);
-                setIsAddingFeature(true);
+                setisAdding(true);
                 setCurrentMode('adding');
             } else {
                 setIsEditing(false);
-                setIsAddingFeature(false);
+                setisAdding(false);
                 setCurrentMode(null);
             }
         }
@@ -210,7 +210,7 @@ const Dashboard: React.FC = () => {
     };
 
     const handleCancelNewFeature = () => {
-        // setIsAddingFeature(false);
+        // setisAdding(false);
         setNewFeatureName('');
         setResetTrigger(false);
         setTimeout(() => setResetTrigger(true), 0);
@@ -351,7 +351,7 @@ const Dashboard: React.FC = () => {
                     {showContent ? (
                         <>
                             <Grid 
-                            isAddingFeature={isAddingFeature}
+                            isAdding={isAdding}
                             isEditing={isEditing} 
                             resetSelection={resetTrigger} 
                             unavailableGrids={unavailableGrids} 
