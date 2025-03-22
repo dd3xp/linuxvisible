@@ -6,9 +6,19 @@ interface GridProps {
     isEditing: boolean;
     resetSelection: boolean;
     unavailableGrids: number[][]; // 接收不可用格子数据
+    level2ContainerGrids: Record<number, number[][]>; // 接收 level 2 容器的格子数据
+    setHaveUnavailableGrids: (value: boolean) => void; // 用于根据是否有不可用格子来控制是否可以保存
+    setDifferentParents: (value: boolean) => void; // 用于根据是否有不同父级来控制是否可以保存
 }
 
-const Grid: React.FC<GridProps> = ({ isEditing, resetSelection, unavailableGrids }) => {
+const Grid: React.FC<GridProps> = ({ 
+    isEditing, 
+    resetSelection, 
+    unavailableGrids, 
+    level2ContainerGrids, 
+    setHaveUnavailableGrids, 
+    setDifferentParents }) => {
+
     const WIDTH = linuxSize[0];
     const HEIGHT = linuxSize[1];
     const GRID = gridSize;
@@ -109,6 +119,41 @@ const Grid: React.FC<GridProps> = ({ isEditing, resetSelection, unavailableGrids
         setSelectionBox(null);
         setFinalSelectedCells(new Set(hoverSelectedCells));
 
+        if (hoverSelectedCells.size === 0) {
+            console.log('No grids selected.');
+            setFinalSelectedCells(new Set());
+            setHaveUnavailableGrids(false);
+            return;
+        }
+
+        // 检查是否有不同的父级
+        const parentSet = new Set<number>();
+        const findParent = (row: number, col: number): number | null => {
+            for (const [eid, gridList] of Object.entries(level2ContainerGrids)) {
+                if (gridList.some(([r, c]) => r === row && c === col)) {
+                    return Number(eid);
+                }
+            }
+            return null;
+        };
+    
+        hoverSelectedCells.forEach((cellStr) => {
+            const [row, col] = cellStr.split('-').map(Number);
+            const parent = findParent(row, col);
+            if (parent !== null) {
+                parentSet.add(parent);
+            }
+        });
+    
+        if (parentSet.size > 1) {
+            console.error('different parents selected:', parentSet);
+            setDifferentParents(true);
+        } else {
+            setDifferentParents(false);
+        }
+
+        setFinalSelectedCells(new Set(hoverSelectedCells));
+
         // 对比框选的格子和不可用格子
         const invalidCells = Array.from(hoverSelectedCells).filter((cell) => {
             const [row, col] = cell.split('-').map(Number);
@@ -117,8 +162,10 @@ const Grid: React.FC<GridProps> = ({ isEditing, resetSelection, unavailableGrids
 
         if (invalidCells.length > 0) {
             console.log('Invalid cells selected:', invalidCells);
+            setHaveUnavailableGrids(true);
         } else {
             console.log('All selected cells are valid.');
+            setHaveUnavailableGrids(false);
         }
     };
 

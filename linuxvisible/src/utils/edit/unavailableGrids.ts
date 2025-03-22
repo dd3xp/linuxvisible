@@ -24,12 +24,42 @@ export const calculateUnavailableGrids = (entities: EntityNode[]): number[][] =>
             // 遍历该区域内的所有格子
             for (let row = startRow; row <= endRow; row++) {
                 for (let col = startCol; col <= endCol; col++) {
-                    unavailableGrids.push([row, col]); // 存入 [row, col] 格式
+                    unavailableGrids.push([row, col]);
                 }
             }
         });
 
     return unavailableGrids;
+};
+
+// 计算 level 2 容器的格子
+export const calculateLevel2ContainerGrids = (entities: EntityNode[]): Record<number, number[][]> => {
+    const level2ContainerGrids: Record<number, number[][]> = {};
+
+    entities
+        .filter(entity => entity.level === 2)
+        .forEach(({ eid, x1, y1, x2, y2 }) => {
+            const minX = Math.min(x1, x2);
+            const maxX = Math.max(x1, x2);
+            const minY = Math.min(y1, y2);
+            const maxY = Math.max(y1, y2);
+
+            const startRow = Math.floor(minX);
+            const endRow = Math.floor(maxX);
+            const startCol = Math.floor(minY);
+            const endCol = Math.floor(maxY);
+
+            const grids: number[][] = [];
+            for (let row = startRow; row <= endRow; row++) {
+                for (let col = startCol; col <= endCol; col++) {
+                    grids.push([row, col]);
+                }
+            }
+
+            level2ContainerGrids[eid] = grids;
+        });
+
+    return level2ContainerGrids;
 };
 
 // 计算添加特征时不可用的格子
