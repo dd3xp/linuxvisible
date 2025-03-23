@@ -12,7 +12,9 @@ import {
     calculateAddFeatureUnavailableGrids, 
     calculateEditFeatureUnavailableGrids, 
     calculateParentsGrids, 
-    findStrictContainerName
+    findStrictContainerName,
+    calculateParentContainerName,
+    findParentContainerId
  } from '../../utils/edit/unavailableGrids';
 
 interface VersionInformation {
@@ -49,6 +51,7 @@ const Dashboard: React.FC = () => {
     const [haveUnavailableGrids, setHaveUnavailableGrids] = useState(false);
     const [differentParents, setDifferentParents] = useState(false);
     const level2ContainerGrids = useMemo(() => calculateParentsGrids(entities, 2), [entities]);
+    const level1ContainerGrids = useMemo(() => calculateParentsGrids(entities, 1), [entities]);
 
     // 实体备份
     const [originEntities, setOriginEntities] = useState<EntityNode[]>([]);
@@ -57,7 +60,6 @@ const Dashboard: React.FC = () => {
     const [currentMode, setCurrentMode] = useState<'editing' | 'adding' | null>(null);
 
     // 修改的内容
-    const [editingEid, setEditingEid] = useState<number | null>(null);
     const [editingDisplayName, setEditingDisplayName] = useState('');
     const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
     const [editingParentEid, setEditingParentEid] = useState<number | null>(null);
@@ -65,13 +67,11 @@ const Dashboard: React.FC = () => {
     const [editingDisplayNameCn, setEditingDisplayNameCn] = useState<string>('');
 
     // 新增的内容
-    const [newFeatureEid, setNewFeatureEid] = useState<number | null>(null);
     const [newFeaturePosition, setNewFeaturePosition] = useState<string>('');
     const [newFeatureParentContainerName, setNewFeatureParentContainerName] = useState<string>('无效的父容器');
     const [newFeatureNameCn, setNewFeatureNameCn] = useState<string>('');
 
     // 保存用变量：修改特性
-    const [savedEditingEid, setSavedEditingEid] = useState<number | null>(null);
     const [savedEditingName, setSavedEditingName] = useState<string>('');
     const [savedEditingX1, setSavedEditingX1] = useState<number | null>(null);
     const [savedEditingY1, setSavedEditingY1] = useState<number | null>(null);
@@ -81,7 +81,6 @@ const Dashboard: React.FC = () => {
     const [savedEditingParentEid, setSavedEditingParentEid] = useState<number | null>(null);
     
     // 保存用变量：添加特性
-    const [savedNewEid, setSavedNewEid] = useState<number | null>(null);
     const [savedNewName, setSavedNewName] = useState<string>('');
     const [savedNewX1, setSavedNewX1] = useState<number | null>(null);
     const [savedNewY1, setSavedNewY1] = useState<number | null>(null);
@@ -90,38 +89,39 @@ const Dashboard: React.FC = () => {
     const [savedNewNameCn, setSavedNewNameCn] = useState<string>('');
     const [savedNewParentEid, setSavedNewParentEid] = useState<number | null>(null);
 
+    // 修改特性的时间
+    const [savedEditingUpdateTime, setSavedEditingUpdateTime] = useState<string>('');
+
+    // 添加特性的时间
+    const [savedNewCreateTime, setSavedNewCreateTime] = useState<string>('');
+    const [savedNewUpdateTime, setSavedNewUpdateTime] = useState<string>('');
+
     const editingEntitiesPosition = useMemo(() => {
         const entity = featureName ? entities.find(e => e.nameEn === featureName) ?? null : null;
         if (!entity) return '';
         const { x1, y1, x2, y2 } = entity;
         return `(${x1}, ${y1}) - (${x2}, ${y2})`;
-    }, [entities, featureName]);      
+    }, [entities, featureName]);
     
     const displayPosition = selectedPosition ?? editingEntitiesPosition;
 
     // 计算显示父容器名
-    const editingParentName = useMemo(() => {
-        const pos = (selectedPosition ?? editingEntitiesPosition).match(/\((\d+), (\d+)\) - \((\d+), (\d+)\)/);
-        if (!pos) return '暂无';
-    
-        const [x1, y1, x2, y2] = [Number(pos[1]), Number(pos[2]), Number(pos[3]), Number(pos[4])];
-    
-        const level1Grids = calculateParentsGrids(entities, 1);
-        const parentName = findStrictContainerName(entities, level2ContainerGrids, level1Grids, x1, y1, x2, y2);
-        return parentName ?? '无效的父容器';
-    }, [selectedPosition, editingEntitiesPosition, level2ContainerGrids, entities]);      
+    const editingParentName = useMemo(() => 
+        calculateParentContainerName(
+            selectedPosition ?? editingEntitiesPosition,
+            entities,
+            level2ContainerGrids
+        ),
+    [selectedPosition, editingEntitiesPosition, level2ContainerGrids, entities]);      
     
     // 计算新特性的父容器名
-    const newFeatureParentName = useMemo(() => {
-        const pos = newFeaturePosition.match(/\((\d+), (\d+)\) - \((\d+), (\d+)\)/);
-        if (!pos) return '暂无';
-    
-        const [x1, y1, x2, y2] = [Number(pos[1]), Number(pos[2]), Number(pos[3]), Number(pos[4])];
-    
-        const level1Grids = calculateParentsGrids(entities, 1);
-        const parentName = findStrictContainerName(entities, level2ContainerGrids, level1Grids, x1, y1, x2, y2);
-        return parentName ?? '无效的父容器';
-    }, [newFeaturePosition, level2ContainerGrids, entities]);              
+    const newFeatureParentName = useMemo(() => 
+        calculateParentContainerName(
+            newFeaturePosition,
+            entities,
+            level2ContainerGrids
+        ),
+    [newFeaturePosition, level2ContainerGrids, entities]);
 
     useEffect(() => {
         getVersion().then((data) => {
@@ -140,6 +140,7 @@ const Dashboard: React.FC = () => {
         }
     }, [versionInfo]);
 
+    // 计算和输出不可用格子
     useEffect(() => {
         console.log('Entities:', entities);
         if (isAdding) {
@@ -180,23 +181,23 @@ const Dashboard: React.FC = () => {
     const handleFeatureSelection = (feature: string) => {
         setFeatureName(feature);
         setActivePanelKey((prev) => {
-          const keys = new Set(prev);
-          keys.add('feature-add');
-          keys.delete('feature-create');
-          return Array.from(keys);
+            const keys = new Set(prev);
+            keys.add('feature-add');
+            keys.delete('feature-create');
+            return Array.from(keys);
         });
-      
+        
         const entity = entities.find(e => e.nameEn === feature);
         if (entity) {
-          setIsEditing(true);
-          setEditingEid(entity.eid);
-          setEditingDisplayName(entity.nameEn);
-          setEditingDisplayNameCn(entity.nameCn ?? '');
-          setisAdding(false);
-          setCurrentMode('editing');
+            setIsEditing(true);
+            setEditingDisplayName(entity.nameEn);
+            setEditingDisplayNameCn(entity.nameCn ?? '');
+            setisAdding(false);
+            setCurrentMode('editing');
         }
     };
 
+    // 处理页面切换
     const handlePanelChange = (keys: string[] | string) => {
         let keyArray = typeof keys === 'string' ? [keys] : [...keys];
     
@@ -215,7 +216,6 @@ const Dashboard: React.FC = () => {
                     const entity = entities.find(e => e.nameEn === featureName);
                     if (entity) {
                         setIsEditing(true);
-                        setEditingEid(entity.eid);
                         setEditingDisplayName(entity.nameEn);
                         setCurrentMode('editing');
                     }
@@ -237,7 +237,6 @@ const Dashboard: React.FC = () => {
                     const entity = entities.find(e => e.nameEn === featureName);
                     if (entity) {
                         setIsEditing(true);
-                        setEditingEid(entity.eid);
                         setEditingDisplayName(entity.nameEn);
                         setCurrentMode('editing');
                     }
@@ -259,10 +258,10 @@ const Dashboard: React.FC = () => {
         setActivePanelKey(keyArray);
     };
 
+    // 取消修改特性
     const handleCancelEditingiting = () => {
         setIsEditing(false);
         setSelectedKernel(null);
-        setEditingEid(null);
         setFeatureName('');
         setResetTrigger(false);
         setEditingDisplayName('');
@@ -274,9 +273,8 @@ const Dashboard: React.FC = () => {
         setTimeout(() => setResetTrigger(true), 0);
     };
 
+    // 取消添加特性
     const handleCancelNewFeature = () => {
-        // setisAdding(false);
-        setNewFeatureEid(null);
         setNewFeatureName('');
         setNewFeatureNameCn('');
         setResetTrigger(false);
@@ -284,11 +282,21 @@ const Dashboard: React.FC = () => {
         setTimeout(() => setResetTrigger(true), 0);
     };
 
+    // 添加一个格式化时间的函数
+    const formatDateTime = (date: Date): string => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    };
+
     const handleSaveEditingFeature = () => {
         const errors: string[] = [];
 
         if (!featureName) errors.push('请选择要修改的特性');
-        if (!editingEid) errors.push('请填写 eid');
         if (!editingDisplayName) errors.push('请填写显示名称');
         if (haveUnavailableGrids) errors.push('所选区域包含无效格子');
         if (differentParents) errors.push('所选区域不属于同一父容器');
@@ -297,12 +305,12 @@ const Dashboard: React.FC = () => {
             message.error(errors.join('，'));
             return;
         }
-    
+
         // 保存数据
-        setSavedEditingEid(editingEid);
         setSavedEditingName(editingDisplayName);
         setSavedEditingNameCn(editingDisplayNameCn);
-    
+        setSavedEditingUpdateTime(formatDateTime(new Date()));
+
         const pos = (selectedPosition ?? editingEntitiesPosition).match(/\((\d+), (\d+)\) - \((\d+), (\d+)\)/);
         if (pos) {
             const [x1, y1, x2, y2] = [Number(pos[1]), Number(pos[2]), Number(pos[3]), Number(pos[4])];
@@ -310,22 +318,18 @@ const Dashboard: React.FC = () => {
             setSavedEditingY1(y1);
             setSavedEditingX2(x2);
             setSavedEditingY2(y2);
-    
-            const parentEntry = Object.entries(level2ContainerGrids).find(([_, grids]) =>
-                grids.some(([r, c]) => r === x1 && c === y1) && grids.some(([r, c]) => r === x2 && c === y2)
-            );
-            setSavedEditingParentEid(parentEntry ? Number(parentEntry[0]) : null);
+
+            // 获取父容器信息
+            const parentInfo = findParentContainerId(x1, y1, x2, y2, level2ContainerGrids, level1ContainerGrids);
+            setSavedEditingParentEid(parentInfo ? parentInfo.eid : null);
         }
-    
-        setHaveUnavailableGrids(false); // 清除非法区域状态
-        setDifferentParents(false); // 清除不同父容器状态
+
         handleCancelEditingiting();
-    };    
+    };
 
     useEffect(() => {
-        if (savedEditingEid !== null) {
+        if (savedEditingName) {
             console.log('修改特性已保存：', {
-                eid: savedEditingEid,
                 nameEn: savedEditingName,
                 nameCn: savedEditingNameCn,
                 x1: savedEditingX1,
@@ -333,14 +337,16 @@ const Dashboard: React.FC = () => {
                 x2: savedEditingX2,
                 y2: savedEditingY2,
                 parentEid: savedEditingParentEid,
+                updateTime: savedEditingUpdateTime,
             });
         }
-    }, [savedEditingEid, savedEditingX1, savedEditingY1, savedEditingX2, savedEditingY2, savedEditingParentEid]);    
+    }, [savedEditingName, savedEditingX1, savedEditingY1, savedEditingX2, savedEditingY2, 
+        savedEditingParentEid, savedEditingUpdateTime]);
 
+    // 保存添加特性
     const handleSaveNewFeature = () => {
         const errors: string[] = [];
-    
-        if (!newFeatureEid) errors.push('请填写 eid');
+
         if (!newFeatureName) errors.push('请填写显示名称');
         if (!newFeaturePosition) errors.push('请先框选一个区域');
         if (haveUnavailableGrids) errors.push('所选区域包含无效格子');
@@ -350,12 +356,14 @@ const Dashboard: React.FC = () => {
             message.error(errors.join('，'));
             return;
         }
-    
+
         // 保存新特性的数据
-        setSavedNewEid(newFeatureEid);
         setSavedNewName(newFeatureName);
         setSavedNewNameCn(newFeatureNameCn);
-    
+        const currentTime = formatDateTime(new Date());
+        setSavedNewCreateTime(currentTime);
+        setSavedNewUpdateTime(currentTime);
+
         const pos = newFeaturePosition.match(/\((\d+), (\d+)\) - \((\d+), (\d+)\)/);
         if (pos) {
             const [x1, y1, x2, y2] = [Number(pos[1]), Number(pos[2]), Number(pos[3]), Number(pos[4])];
@@ -363,20 +371,18 @@ const Dashboard: React.FC = () => {
             setSavedNewY1(y1);
             setSavedNewX2(x2);
             setSavedNewY2(y2);
-    
-            const parentEntry = Object.entries(level2ContainerGrids).find(([_, grids]) =>
-                grids.some(([r, c]) => r === x1 && c === y1) && grids.some(([r, c]) => r === x2 && c === y2)
-            );
-            setSavedNewParentEid(parentEntry ? Number(parentEntry[0]) : null);
+
+            // 获取父容器信息
+            const parentInfo = findParentContainerId(x1, y1, x2, y2, level2ContainerGrids, level1ContainerGrids);
+            setSavedNewParentEid(parentInfo ? parentInfo.eid : null);
         }
-    
+
         handleCancelNewFeature();
     };    
     
     useEffect(() => {
-        if (savedNewEid !== null) {
+        if (savedNewName) {
             console.log('添加特性已保存：', {
-                eid: savedNewEid,
                 nameEn: savedNewName,
                 nameCn: savedNewNameCn,
                 x1: savedNewX1,
@@ -384,9 +390,12 @@ const Dashboard: React.FC = () => {
                 x2: savedNewX2,
                 y2: savedNewY2,
                 parentEid: savedNewParentEid,
+                createTime: savedNewCreateTime,
+                updateTime: savedNewUpdateTime,
             });
         }
-    }, [savedNewEid, savedNewX1, savedNewY1, savedNewX2, savedNewY2, savedNewParentEid]);
+    }, [savedNewName, savedNewX1, savedNewY1, savedNewX2, savedNewY2, 
+        savedNewParentEid, savedNewCreateTime, savedNewUpdateTime]);
 
     return (
         <div className={styles.dashboardContainer}>
@@ -447,12 +456,6 @@ const Dashboard: React.FC = () => {
                                 />
                                 </Form.Item>
                                     <>
-                                    <Form.Item label="eid" style={{ marginBottom: 8}}>
-                                    <Input 
-                                        value={editingEid ?? ''} 
-                                        onChange={e => setEditingEid(Number(e.target.value))} 
-                                    />
-                                    </Form.Item>
                                     <Form.Item label="显示名称" style={{ marginBottom: 8 }}>
                                     <Input 
                                         value={editingDisplayName} 
@@ -484,14 +487,6 @@ const Dashboard: React.FC = () => {
                         children: (
                           <div className={styles.featurePanel}>
                             <Form layout="vertical">
-                              <Form.Item label="eid">
-                                <Input
-                                  placeholder="请输入 eid"
-                                  value={newFeatureEid ?? ''}
-                                  onChange={(e) => setNewFeatureEid(Number(e.target.value))}
-                                />
-                              </Form.Item>
-                      
                               <Form.Item label="显示名称">
                                 <Input
                                   placeholder="输入新的特性名称"
@@ -538,10 +533,12 @@ const Dashboard: React.FC = () => {
                                 setHaveUnavailableGrids={setHaveUnavailableGrids}
                                 setDifferentParents={setDifferentParents}
                                 level2ContainerGrids={level2ContainerGrids}
+                                level1ContainerGrids={level1ContainerGrids}
                                 setSelectedPosition={setSelectedPosition}
                                 setNewFeaturePosition={setNewFeaturePosition}
                                 setEditingParentContainerName={setEditingParentContainerName} 
                                 setNewFeatureParentContainerName={setNewFeatureParentContainerName}
+                                entities={entities}
                             />
                             <Kernel 
                             versionInfo={versionInfo} 
