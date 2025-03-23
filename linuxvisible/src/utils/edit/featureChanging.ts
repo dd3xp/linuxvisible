@@ -39,12 +39,15 @@ export interface EntityNode {
 */
 
 import { EntityNode } from "../API.d";
+import { message, Modal } from 'antd';
+import { submitEditGraph } from '../../services/edit/applyEdit';
 
 interface FeatureLog {
     time: string;
     content: string;
 }
 
+// 保存修改特性的函数
 export const saveEditingFeature = (
     entities: EntityNode[],
     editingEid: number,
@@ -120,6 +123,7 @@ export const saveEditingFeature = (
     return [entities, logs];
 };
 
+// 保存新增特性的函数
 export function saveNewFeature(
     entities: EntityNode[],
     nameEn: string,
@@ -168,7 +172,7 @@ export function saveNewFeature(
     return [updatedEntities, [...logs, newLog]];
 }
 
-// 添加删除特性的函数
+// 删除特性的函数
 export function deleteFeature(
     entities: EntityNode[],
     deleteEid: number,
@@ -190,3 +194,92 @@ export function deleteFeature(
 
     return [updatedEntities, [...logs, deleteLog]];
 }
+
+export const applyEdits = async (entities: EntityNode[], version: string, repoPath: string) => {
+    try {
+        await submitEditGraph(entities, version, repoPath);
+        message.success('编辑已应用');
+        return true;
+    } catch (error) {
+        Modal.error({
+            title: '连接错误',
+            content: error instanceof Error ? error.message : '应用编辑失败，请检查后端服务是否正常运行',
+            okText: '确定',
+            styles: {
+                mask: { zIndex: 9998 },
+                wrapper: { zIndex: 9999 }
+            }
+        });
+        console.error(error);
+        return false;
+    }
+};
+
+// 应用编辑的函数
+export const handleApplyEdits = async (
+    entities: EntityNode[], 
+    setOriginEntities: (entities: EntityNode[]) => void,
+    version: string,
+    repoPath: string
+) => {
+    try {
+        await submitEditGraph(entities, version, repoPath);
+        message.success({
+            content: '编辑已应用',
+            style: { 
+                zIndex: 9999999,
+            }
+        });
+
+        setOriginEntities(entities);
+        return true;
+    } catch (error) {
+        Modal.error({
+            title: '连接错误',
+            content: error instanceof Error ? error.message : '应用编辑失败，请检查后端服务是否正常运行',
+            okText: '确定',
+            styles: {
+                mask: { zIndex: 99998 },
+                wrapper: { zIndex: 99999 }
+            }
+        });
+
+        console.error(error);
+        return false;
+    }
+};
+
+// 舍弃编辑的函数
+export const handleDiscardEdits = (
+    entities: EntityNode[],
+    originEntities: EntityNode[],
+    setEntities: (entities: EntityNode[]) => void,
+    currentMode: 'editing' | 'adding' | null,
+    handleCancelEditingiting: () => void,
+    handleCancelNewFeature: () => void
+) => {
+    Modal.confirm({
+        title: '确认舍弃',
+        content: '确定要舍弃所有编辑吗？这将恢复到原始状态。',
+        okText: '确认',
+        cancelText: '取消',
+        okType: 'danger',
+        styles: {
+            mask: { zIndex: 99998 },
+            wrapper: { zIndex: 99999 }
+        },
+        onOk: () => {
+            setEntities(originEntities);
+            message.info({
+                content: '已恢复到原始状态',
+                duration: 2
+            });
+
+            if (currentMode === 'editing') {
+                handleCancelEditingiting();
+            } else if (currentMode === 'adding') {
+                handleCancelNewFeature();
+            }
+        }
+    });
+};

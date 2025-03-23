@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import styles from '../../styles/Edit/Grid.module.css';
+import styles from '../../styles/edit/Grid.module.css';
 import { gridSize, linuxSize } from '../../utils/calculateContainerPos';
 import { 
     calculateSelectedCoordinates, 
@@ -10,12 +10,12 @@ import {
 import { EntityNode } from '../../utils/API';
 
 interface GridProps {
-    isEditing: boolean;
-    isAdding: boolean;
-    resetSelection: boolean;
+    isEditing: boolean; // 是否处于编辑状态
+    isAdding: boolean; // 是否处于添加状态
+    resetSelection: boolean; // 是否重置选择
     unavailableGrids: number[][]; // 接收不可用格子数据
     level2ContainerGrids: Record<number, number[][]>; // 接收 level 2 容器的格子数据
-    level1ContainerGrids: Record<number, number[][]>; // 改为 level1ContainerGrids
+    level1ContainerGrids: Record<number, number[][]>; // 接收 level 1 容器的格子数据
     setHaveUnavailableGrids: (value: boolean) => void; // 用于根据是否有不可用格子来控制是否可以保存
     setDifferentParents: (value: boolean) => void; // 用于根据是否有不同父级来控制是否可以保存
     setSelectedPosition: (value: string | null) => void; // 用于保存编辑后的实体位置

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'antd';
-import styles from '../../styles/Edit/LogViewer.module.css';
+import styles from '../../styles/edit/LogViewer.module.css';
 
 interface LogViewerProps {
     visible: boolean;

@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { Collapse, Form, Select, Button, Input, message, Modal } from 'antd';
 import { getVersion } from '../../services/feature';
 import { Empty } from 'antd';
-import styles from '../../styles/Edit/Dashboard.module.css';
+import styles from '../../styles/edit/Dashboard.module.css';
 import Kernel from './kernel';
 import Grid from './grid';
 import React from 'react';
@@ -15,7 +15,13 @@ import {
     calculateParentContainerName,
     findParentContainerId
  } from '../../utils/edit/unavailableGrids';
-import { saveEditingFeature, saveNewFeature, deleteFeature } from '../../utils/edit/featureChanging';
+import { 
+    saveEditingFeature, 
+    saveNewFeature, 
+    deleteFeature, 
+    handleApplyEdits,
+    handleDiscardEdits
+} from '../../utils/edit/featureChanging';
 import LogViewer from './LogViewer';
 
 interface VersionInformation {
@@ -84,6 +90,7 @@ const Dashboard: React.FC = () => {
     // 添加状态控制日志查看器的显示
     const [logViewerVisible, setLogViewerVisible] = useState(false);
 
+    // 计算显示位置
     const editingEntitiesPosition = useMemo(() => {
         const entity = featureName ? entities.find(e => e.nameEn === featureName) ?? null : null;
         if (!entity) return '';
@@ -192,7 +199,7 @@ const Dashboard: React.FC = () => {
             setIsEditing(true);
             setEditingDisplayName(entity.nameEn);
             setEditingDisplayNameCn(entity.nameCn ?? '');
-            setEditingFeatureEid(entity.eid);  // 保存 eid
+            setEditingFeatureEid(entity.eid);
             setisAdding(false);
             setCurrentMode('editing');
         }
@@ -264,7 +271,7 @@ const Dashboard: React.FC = () => {
         setIsEditing(false);
         setSelectedKernel(null);
         setFeatureName('');
-        setEditingFeatureEid(null);  // 清除 eid
+        setEditingFeatureEid(null);
         setResetTrigger(false);
         setEditingDisplayName('');
         setEditingDisplayNameCn('');
@@ -284,7 +291,7 @@ const Dashboard: React.FC = () => {
         setTimeout(() => setResetTrigger(true), 0);
     };
 
-    // 添加一个格式化时间的函数
+    // 格式化时间的函数
     const formatDateTime = (date: Date): string => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -308,7 +315,6 @@ const Dashboard: React.FC = () => {
             return;
         }
 
-        // 确保 editingFeatureEid 不为 null
         if (editingFeatureEid === null) {
             return;
         }
@@ -371,12 +377,12 @@ const Dashboard: React.FC = () => {
                 currentTime,
                 currentTime,
                 featureLogs,
-                currentTempEid  // 传入临时 eid
+                currentTempEid
             );
 
             setEntities(updatedEntities);
             setFeatureLogs(updatedLogs);
-            setTempEidCounter(prev => prev - 1);  // 更新临时 eid 计数器
+            setTempEidCounter(prev => prev - 1);
             handleCancelNewFeature();
         }
     };    
@@ -547,8 +553,8 @@ const Dashboard: React.FC = () => {
                                 <div>{newFeaturePosition || '暂无'}</div>
                               </Form.Item>
                               <Form.Item label="父容器">
-                            <div>{newFeatureParentName}</div>
-                            </Form.Item>
+                                <div>{newFeatureParentName}</div> 
+                              </Form.Item>
                               <Button type="primary" onClick={handleSaveNewFeature} style={{ marginRight: 10 }}>保存</Button>
                               <Button type="default" onClick={handleCancelNewFeature}>取消</Button>
                             </Form>
@@ -564,13 +570,12 @@ const Dashboard: React.FC = () => {
                 <div style={{ marginTop: 16, marginLeft: 8, display: 'flex', gap: 8 }}>
                     <Button 
                         type="primary" 
-                        onClick={() => {
-                            if (currentMode === 'editing') {
-                                handleSaveEditingFeature();
-                            } else if (currentMode === 'adding') {
-                                handleSaveNewFeature();
-                            }
-                        }}
+                        onClick={() => handleApplyEdits(
+                            entities, 
+                            setOriginEntities,
+                            versionInfo?.version || '',
+                            versionInfo?.repo || ''
+                        )}
                         style={{ width: 70, height: 32 }}
                     >
                         应用编辑
@@ -578,13 +583,14 @@ const Dashboard: React.FC = () => {
                     <Button 
                         type="primary"
                         danger
-                        onClick={() => {
-                            if (currentMode === 'editing') {
-                                handleCancelEditingiting();
-                            } else if (currentMode === 'adding') {
-                                handleCancelNewFeature();
-                            }
-                        }}
+                        onClick={() => handleDiscardEdits(
+                            entities,
+                            originEntities,
+                            setEntities,
+                            currentMode,
+                            handleCancelEditingiting,
+                            handleCancelNewFeature
+                        )}
                         style={{ width: 70, height: 32 }}
                     >
                         舍弃编辑
