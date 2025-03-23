@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Collapse, Form, Select, Button, Input, message } from 'antd';
+import { Collapse, Form, Select, Button, Input, message, Modal } from 'antd';
 import { getVersion } from '../../services/feature';
 import { Empty } from 'antd';
 import styles from '../../styles/Edit/Dashboard.module.css';
@@ -12,10 +12,11 @@ import {
     calculateAddFeatureUnavailableGrids, 
     calculateEditFeatureUnavailableGrids, 
     calculateParentsGrids, 
-    findStrictContainerName,
     calculateParentContainerName,
     findParentContainerId
  } from '../../utils/edit/unavailableGrids';
+import { saveEditingFeature, saveNewFeature, deleteFeature } from '../../utils/edit/featureChanging';
+import LogViewer from './LogViewer';
 
 interface VersionInformation {
     repo: string | null;
@@ -71,30 +72,17 @@ const Dashboard: React.FC = () => {
     const [newFeatureParentContainerName, setNewFeatureParentContainerName] = useState<string>('无效的父容器');
     const [newFeatureNameCn, setNewFeatureNameCn] = useState<string>('');
 
-    // 保存用变量：修改特性
-    const [savedEditingName, setSavedEditingName] = useState<string>('');
-    const [savedEditingX1, setSavedEditingX1] = useState<number | null>(null);
-    const [savedEditingY1, setSavedEditingY1] = useState<number | null>(null);
-    const [savedEditingX2, setSavedEditingX2] = useState<number | null>(null);
-    const [savedEditingY2, setSavedEditingY2] = useState<number | null>(null);
-    const [savedEditingNameCn, setSavedEditingNameCn] = useState<string>('');
-    const [savedEditingParentEid, setSavedEditingParentEid] = useState<number | null>(null);
-    
-    // 保存用变量：添加特性
-    const [savedNewName, setSavedNewName] = useState<string>('');
-    const [savedNewX1, setSavedNewX1] = useState<number | null>(null);
-    const [savedNewY1, setSavedNewY1] = useState<number | null>(null);
-    const [savedNewX2, setSavedNewX2] = useState<number | null>(null);
-    const [savedNewY2, setSavedNewY2] = useState<number | null>(null);
-    const [savedNewNameCn, setSavedNewNameCn] = useState<string>('');
-    const [savedNewParentEid, setSavedNewParentEid] = useState<number | null>(null);
+    // 新增的 logs 状态
+    const [featureLogs, setFeatureLogs] = useState<{ time: string; content: string; }[]>([]);
 
-    // 修改特性的时间
-    const [savedEditingUpdateTime, setSavedEditingUpdateTime] = useState<string>('');
+    // 添加一个状态来保存正在编辑的特性的 eid
+    const [editingFeatureEid, setEditingFeatureEid] = useState<number | null>(null);
 
-    // 添加特性的时间
-    const [savedNewCreateTime, setSavedNewCreateTime] = useState<string>('');
-    const [savedNewUpdateTime, setSavedNewUpdateTime] = useState<string>('');
+    // 添加一个新的状态来跟踪当前的临时 eid
+    const [tempEidCounter, setTempEidCounter] = useState<number>(-2);
+
+    // 添加状态控制日志查看器的显示
+    const [logViewerVisible, setLogViewerVisible] = useState(false);
 
     const editingEntitiesPosition = useMemo(() => {
         const entity = featureName ? entities.find(e => e.nameEn === featureName) ?? null : null;
@@ -158,6 +146,18 @@ const Dashboard: React.FC = () => {
         }
     }, [isAdding, isEditing, entities, featureName]);
 
+    // 添加这个 useEffect 来监听日志变化
+    useEffect(() => {
+        if (featureLogs.length > 0) {
+            const latestLog = featureLogs[featureLogs.length - 1];
+            console.log('操作日志:', latestLog);
+        }
+    }, [featureLogs]);
+
+    useEffect(() => {
+        console.log('所有日志:', featureLogs);
+    }, [featureLogs]);
+
     const handleRepoChange = (repo: string) => {
         setVersionInfo({ repo, version: null });
         setVersionList(versionData[repo] || []);
@@ -192,6 +192,7 @@ const Dashboard: React.FC = () => {
             setIsEditing(true);
             setEditingDisplayName(entity.nameEn);
             setEditingDisplayNameCn(entity.nameCn ?? '');
+            setEditingFeatureEid(entity.eid);  // 保存 eid
             setisAdding(false);
             setCurrentMode('editing');
         }
@@ -263,6 +264,7 @@ const Dashboard: React.FC = () => {
         setIsEditing(false);
         setSelectedKernel(null);
         setFeatureName('');
+        setEditingFeatureEid(null);  // 清除 eid
         setResetTrigger(false);
         setEditingDisplayName('');
         setEditingDisplayNameCn('');
@@ -296,7 +298,7 @@ const Dashboard: React.FC = () => {
     const handleSaveEditingFeature = () => {
         const errors: string[] = [];
 
-        if (!featureName) errors.push('请选择要修改的特性');
+        if (editingFeatureEid === null) errors.push('请选择要修改的特性');
         if (!editingDisplayName) errors.push('请填写显示名称');
         if (haveUnavailableGrids) errors.push('所选区域包含无效格子');
         if (differentParents) errors.push('所选区域不属于同一父容器');
@@ -306,44 +308,36 @@ const Dashboard: React.FC = () => {
             return;
         }
 
-        // 保存数据
-        setSavedEditingName(editingDisplayName);
-        setSavedEditingNameCn(editingDisplayNameCn);
-        setSavedEditingUpdateTime(formatDateTime(new Date()));
+        // 确保 editingFeatureEid 不为 null
+        if (editingFeatureEid === null) {
+            return;
+        }
 
         const pos = (selectedPosition ?? editingEntitiesPosition).match(/\((\d+), (\d+)\) - \((\d+), (\d+)\)/);
         if (pos) {
             const [x1, y1, x2, y2] = [Number(pos[1]), Number(pos[2]), Number(pos[3]), Number(pos[4])];
-            setSavedEditingX1(x1);
-            setSavedEditingY1(y1);
-            setSavedEditingX2(x2);
-            setSavedEditingY2(y2);
-
-            // 获取父容器信息
+            const updateTime = formatDateTime(new Date());
+            
             const parentInfo = findParentContainerId(x1, y1, x2, y2, level2ContainerGrids, level1ContainerGrids);
-            setSavedEditingParentEid(parentInfo ? parentInfo.eid : null);
-        }
+            const parentEid = parentInfo ? parentInfo.eid : null;
 
-        handleCancelEditingiting();
+            const [updatedEntities, updatedLogs] = saveEditingFeature(
+                entities,
+                editingFeatureEid,
+                editingDisplayName,
+                editingDisplayNameCn,
+                x1, y1, x2, y2,
+                parentEid,
+                updateTime,
+                featureLogs
+            );
+
+            setEntities(updatedEntities);
+            setFeatureLogs(updatedLogs);
+            handleCancelEditingiting();
+        }
     };
 
-    useEffect(() => {
-        if (savedEditingName) {
-            console.log('修改特性已保存：', {
-                nameEn: savedEditingName,
-                nameCn: savedEditingNameCn,
-                x1: savedEditingX1,
-                y1: savedEditingY1,
-                x2: savedEditingX2,
-                y2: savedEditingY2,
-                parentEid: savedEditingParentEid,
-                updateTime: savedEditingUpdateTime,
-            });
-        }
-    }, [savedEditingName, savedEditingX1, savedEditingY1, savedEditingX2, savedEditingY2, 
-        savedEditingParentEid, savedEditingUpdateTime]);
-
-    // 保存添加特性
     const handleSaveNewFeature = () => {
         const errors: string[] = [];
 
@@ -357,52 +351,79 @@ const Dashboard: React.FC = () => {
             return;
         }
 
-        // 保存新特性的数据
-        setSavedNewName(newFeatureName);
-        setSavedNewNameCn(newFeatureNameCn);
-        const currentTime = formatDateTime(new Date());
-        setSavedNewCreateTime(currentTime);
-        setSavedNewUpdateTime(currentTime);
-
         const pos = newFeaturePosition.match(/\((\d+), (\d+)\) - \((\d+), (\d+)\)/);
         if (pos) {
             const [x1, y1, x2, y2] = [Number(pos[1]), Number(pos[2]), Number(pos[3]), Number(pos[4])];
-            setSavedNewX1(x1);
-            setSavedNewY1(y1);
-            setSavedNewX2(x2);
-            setSavedNewY2(y2);
-
-            // 获取父容器信息
+            const currentTime = formatDateTime(new Date());
+            
             const parentInfo = findParentContainerId(x1, y1, x2, y2, level2ContainerGrids, level1ContainerGrids);
-            setSavedNewParentEid(parentInfo ? parentInfo.eid : null);
+            const parentEid = parentInfo ? parentInfo.eid : null;
+
+            // 使用当前的临时 eid
+            const currentTempEid = tempEidCounter;
+
+            const [updatedEntities, updatedLogs] = saveNewFeature(
+                entities,
+                newFeatureName,
+                newFeatureNameCn,
+                x1, y1, x2, y2,
+                parentEid,
+                currentTime,
+                currentTime,
+                featureLogs,
+                currentTempEid  // 传入临时 eid
+            );
+
+            setEntities(updatedEntities);
+            setFeatureLogs(updatedLogs);
+            setTempEidCounter(prev => prev - 1);  // 更新临时 eid 计数器
+            handleCancelNewFeature();
+        }
+    };    
+
+    // 修改删除特性的处理函数
+    const handleDeleteFeature = () => {
+        if (editingFeatureEid === null) {
+            message.error('请先选择要删除的特性');
+            return;
         }
 
-        handleCancelNewFeature();
-    };    
-    
-    useEffect(() => {
-        if (savedNewName) {
-            console.log('添加特性已保存：', {
-                nameEn: savedNewName,
-                nameCn: savedNewNameCn,
-                x1: savedNewX1,
-                y1: savedNewY1,
-                x2: savedNewX2,
-                y2: savedNewY2,
-                parentEid: savedNewParentEid,
-                createTime: savedNewCreateTime,
-                updateTime: savedNewUpdateTime,
-            });
-        }
-    }, [savedNewName, savedNewX1, savedNewY1, savedNewX2, savedNewY2, 
-        savedNewParentEid, savedNewCreateTime, savedNewUpdateTime]);
+        // 找到要删除的特性
+        const feature = entities.find(e => e.eid === editingFeatureEid);
+        if (!feature) return;
+
+        Modal.confirm({
+            title: '确认删除',
+            content: `确定要删除特性 "${feature.nameEn}" 吗？`,
+            okText: '确认',
+            cancelText: '取消',
+            okType: 'danger',
+            styles: {
+                mask: { zIndex: 9998 },
+                wrapper: { zIndex: 9999 }
+            },
+            onOk: () => {
+                const deleteTime = formatDateTime(new Date());
+                const [updatedEntities, updatedLogs] = deleteFeature(
+                    entities,
+                    editingFeatureEid,
+                    deleteTime,
+                    featureLogs
+                );
+
+                setEntities(updatedEntities);
+                setFeatureLogs(updatedLogs);
+                handleCancelEditingiting();
+            }
+        });
+    };
 
     return (
         <div className={styles.dashboardContainer}>
             <div className={styles.sidebar}>
-            <div style={{ marginBottom: 10 }}>
-            当前模式：{currentMode === 'editing' ? '修改特性' : currentMode === 'adding' ? '添加特性' : '无'}
-            </div>
+                <div style={{ marginBottom: 10, marginLeft: 8 }}>
+                    当前模式：{currentMode === 'editing' ? '修改特性' : currentMode === 'adding' ? '添加特性' : '无'}
+                </div>
                 <Collapse items={[
                     {
                         key: 'version-select',
@@ -474,8 +495,29 @@ const Dashboard: React.FC = () => {
                                     <Form.Item label="父容器">
                                         <div>{editingParentName}</div>
                                     </Form.Item>
-                                    <Button type="default" onClick={handleCancelEditingiting} style={{ marginRight: 10 }}>取消</Button>
-                                    <Button type="primary" onClick={handleSaveEditingFeature}>保存</Button>
+                                    <div className={styles.buttonGroup}>
+                                        <Button 
+                                            type="primary" 
+                                            onClick={handleSaveEditingFeature}
+                                            style={{ marginRight: 8 }}
+                                        >
+                                            保存
+                                        </Button>
+                                        <Button 
+                                            type="primary" 
+                                            danger 
+                                            onClick={handleDeleteFeature}
+                                            style={{ marginRight: 8 }}
+                                        >
+                                            删除
+                                        </Button>
+                                        <Button 
+                                            type="default" 
+                                            onClick={handleCancelEditingiting}
+                                        >
+                                            取消
+                                        </Button>
+                                    </div>
                                     </>
                                 </Form>
                             </div>
@@ -507,8 +549,8 @@ const Dashboard: React.FC = () => {
                               <Form.Item label="父容器">
                             <div>{newFeatureParentName}</div>
                             </Form.Item>
-                              <Button type="default" onClick={handleCancelNewFeature} style={{ marginRight: 10 }}>取消</Button>
-                              <Button type="primary" onClick={handleSaveNewFeature}>保存</Button>
+                              <Button type="primary" onClick={handleSaveNewFeature} style={{ marginRight: 10 }}>保存</Button>
+                              <Button type="default" onClick={handleCancelNewFeature}>取消</Button>
                             </Form>
                           </div>
                         ),
@@ -519,6 +561,42 @@ const Dashboard: React.FC = () => {
                     activeKey={activePanelKey}
                     onChange={handlePanelChange}                   
                 />
+                <div style={{ marginTop: 16, marginLeft: 8, display: 'flex', gap: 8 }}>
+                    <Button 
+                        type="primary" 
+                        onClick={() => {
+                            if (currentMode === 'editing') {
+                                handleSaveEditingFeature();
+                            } else if (currentMode === 'adding') {
+                                handleSaveNewFeature();
+                            }
+                        }}
+                        style={{ width: 70, height: 32 }}
+                    >
+                        应用编辑
+                    </Button>
+                    <Button 
+                        type="primary"
+                        danger
+                        onClick={() => {
+                            if (currentMode === 'editing') {
+                                handleCancelEditingiting();
+                            } else if (currentMode === 'adding') {
+                                handleCancelNewFeature();
+                            }
+                        }}
+                        style={{ width: 70, height: 32 }}
+                    >
+                        舍弃编辑
+                    </Button>
+                    <Button 
+                        type="default"
+                        onClick={() => setLogViewerVisible(true)}
+                        style={{ width: 70, height: 32 }}
+                    >
+                        查看日志
+                    </Button>
+                </div>
             </div>
 
             <div className={styles.mainContent}>
@@ -526,19 +604,19 @@ const Dashboard: React.FC = () => {
                     {showContent ? (
                         <>
                             <Grid 
-                                isAdding={isAdding}
-                                isEditing={isEditing}
-                                resetSelection={resetTrigger}
-                                unavailableGrids={unavailableGrids}
-                                setHaveUnavailableGrids={setHaveUnavailableGrids}
-                                setDifferentParents={setDifferentParents}
-                                level2ContainerGrids={level2ContainerGrids}
-                                level1ContainerGrids={level1ContainerGrids}
-                                setSelectedPosition={setSelectedPosition}
-                                setNewFeaturePosition={setNewFeaturePosition}
-                                setEditingParentContainerName={setEditingParentContainerName} 
-                                setNewFeatureParentContainerName={setNewFeatureParentContainerName}
-                                entities={entities}
+                            isAdding={isAdding}
+                            isEditing={isEditing}
+                            resetSelection={resetTrigger}
+                            unavailableGrids={unavailableGrids}
+                            setHaveUnavailableGrids={setHaveUnavailableGrids}
+                            setDifferentParents={setDifferentParents}
+                            level2ContainerGrids={level2ContainerGrids}
+                            level1ContainerGrids={level1ContainerGrids}
+                            setSelectedPosition={setSelectedPosition}
+                            setNewFeaturePosition={setNewFeaturePosition}
+                            setEditingParentContainerName={setEditingParentContainerName} 
+                            setNewFeatureParentContainerName={setNewFeatureParentContainerName}
+                            entities={entities}
                             />
                             <Kernel 
                             versionInfo={versionInfo} 
@@ -550,6 +628,12 @@ const Dashboard: React.FC = () => {
                     ) : <Empty style={{ marginTop: '20%' }} />}
                 </div>
             </div>
+
+            <LogViewer
+                visible={logViewerVisible}
+                onClose={() => setLogViewerVisible(false)}
+                logs={featureLogs}
+            />
         </div>
     );
 };

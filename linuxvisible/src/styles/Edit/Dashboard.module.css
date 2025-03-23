@@ -1,16 +1,18 @@
 .dashboardContainer {
     display: flex;
-    height: 100vh;
+    height: 100%;
 }
 
 .sidebar {
-    width: 200px;
-    padding: 20px;
+    width: 250px;
+    padding: 16px;
+    border-right: 1px solid #f0f0f0;
+    overflow-y: auto;
 }
 
 .mainContent {
-    flex-grow: 1;
-    padding: 20px;
+    flex: 1;
+    position: relative;
 }
 
 .overlay {
